@@ -42,7 +42,7 @@ export function LoginPage() {
           <img src="/logo.png" alt="Velloe Logo" className="login-brand-img" />
           <div>
             <div className="login-brand-name">VELLOE</div>
-            <div className="login-brand-sub">Agentic AI Academy</div>
+            <div className="login-brand-sub">Learns</div>
           </div>
         </div>
 

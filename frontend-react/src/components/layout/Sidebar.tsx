@@ -57,7 +57,7 @@ export function Sidebar({ classes, refreshKey, mobileOpen, onMobileClose }: Side
         <img src="/logo.png" alt="Velloe Logo" className="sidebar-brand-img" />
         <div className="sidebar-brand-text">
           <span className="sidebar-brand-name">VELLOE</span>
-          <span className="sidebar-brand-sub">Agentic AI Academy</span>
+          <span className="sidebar-brand-sub">Learns</span>
         </div>
       </Link>
 

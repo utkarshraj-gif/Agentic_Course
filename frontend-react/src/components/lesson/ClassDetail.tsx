@@ -176,7 +176,7 @@ export function ClassDetail() {
         d.html = annotatedHtml;
         setTtsSentences(sentences);
         setData(d);
-        document.title = `Class ${classId}: ${d.short || d.title} | Velloe Academy`;
+        document.title = `Class ${classId}: ${d.short || d.title} | Velloe Learns`;
         const completed = ProgressService.isClassCompleted(classId);
         setIsCompleted(completed);
         setIsBookmarked(BookmarkService.isBookmarked(classId));

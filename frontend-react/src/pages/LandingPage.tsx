@@ -49,7 +49,7 @@ export function LandingPage() {
         <div className="landing-header-inner">
           <div className="landing-logo">
             <img src="/logo.png" alt="Velloe Logo" className="landing-logo-img" />
-            <span>VELLOE Agentic AI Academy</span>
+            <span>VELLOE Learns</span>
           </div>
           <Link to="/login" className="landing-cta-sm">
             Sign in <ArrowRight size={14} />
@@ -148,7 +148,7 @@ export function LandingPage() {
             <h2>Ready to build production Agentic AI?</h2>
           </div>
           <Link to="/login" className="btn btn--primary btn--lg">
-            Enter the Academy <ArrowRight size={16} />
+            Enter Velloe Learns <ArrowRight size={16} />
           </Link>
         </div>
       </section>
@@ -158,7 +158,7 @@ export function LandingPage() {
         <div className="landing-container">
           <div className="landing-footer-brand">
             <img src="/logo.png" alt="Velloe Logo" className="landing-footer-logo-img" />
-            <span>VELLOE Agentic AI Academy</span>
+            <span>VELLOE Learns</span>
           </div>
           <div className="landing-footer-links">
             <span>Internal use only · VELLOE © 2026</span>

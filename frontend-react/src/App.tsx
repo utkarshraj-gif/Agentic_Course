@@ -31,34 +31,34 @@ function PageTitleManager() {
 
   useEffect(() => {
     const path = location.pathname;
-    let title = 'Velloe | Agentic AI Academy';
+    let title = 'Velloe Learns';
 
     if (path === '/') {
-      title = 'Velloe | Master Enterprise AI Agents';
+      title = 'Velloe Learns | Master Enterprise AI Agents';
     } else if (path === '/login') {
-      title = 'Sign In | Velloe Academy';
+      title = 'Sign In | Velloe Learns';
     } else if (path === '/admin/login') {
       title = 'Admin Authentication | Velloe Ops';
     } else if (path.startsWith('/admin')) {
       title = 'Command Center | Velloe Ops';
     } else if (path === '/dashboard' || path === '/overview') {
-      title = 'Overview | Velloe Academy';
+      title = 'Overview | Velloe Learns';
     } else if (path === '/curriculum') {
-      title = 'Curriculum | Velloe Academy';
+      title = 'Curriculum | Velloe Learns';
     } else if (path.startsWith('/class/')) {
       const id = path.split('/')[2];
-      title = `Class ${id} | Velloe Academy`;
+      title = `Class ${id} | Velloe Learns`;
     } else if (path === '/practice') {
-      title = 'Practice & Labs | Velloe Academy';
+      title = 'Practice & Labs | Velloe Learns';
     } else if (path === '/projects') {
-      title = 'Capstone Projects | Velloe Academy';
+      title = 'Capstone Projects | Velloe Learns';
     } else if (path.startsWith('/capstones/')) {
       const slug = path.split('/')[2];
-      title = `${slug.toUpperCase()} Capstone | Velloe Academy`;
+      title = `${slug.toUpperCase()} Capstone | Velloe Learns`;
     } else if (path === '/skills') {
-      title = 'Skill Map | Velloe Academy';
+      title = 'Skill Map | Velloe Learns';
     } else if (path === '/search') {
-      title = 'Search | Velloe Academy';
+      title = 'Search | Velloe Learns';
     }
 
     document.title = title;

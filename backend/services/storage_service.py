@@ -1,5 +1,5 @@
 # backend/services/storage_service.py
-# NeonDB PostgreSQL persistence service for VELLOE Agentic AI Academy
+# NeonDB PostgreSQL persistence service for VELLOE Learns
 
 import logging
 from datetime import datetime, timezone

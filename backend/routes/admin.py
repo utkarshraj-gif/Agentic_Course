@@ -1,5 +1,5 @@
 # backend/routes/admin.py
-# FastAPI routes for VELLOE Agentic AI Academy Administration & Telemetry
+# FastAPI routes for VELLOE Learns Administration & Telemetry
 
 import logging
 from typing import Optional
