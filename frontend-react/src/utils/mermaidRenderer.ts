@@ -112,53 +112,32 @@ export function parseMermaidFlowchart(diagCode: string): DiagramGraph {
   const rawDir = directionMatch ? directionMatch[1].toUpperCase() : 'LR';
   const direction = rawDir === 'TD' || rawDir === 'TB' ? 'DOWN' : 'RIGHT';
 
-  // 1. Database cylinders: id[(content)]
-  const dbRegex = /([A-Za-z0-9_]+)\[\(([\s\S]*?)\)\]/g;
+  // 1. Extract node definitions in exact linear order of appearance in Mermaid flowchart
+  // Matches:
+  // - Database cylinder: id[(content)]
+  // - Decision diamond: id{content}
+  // - Standard rect: id[content]
+  const nodeDefRegex = /([A-Za-z0-9_]+)(?:\[\(([\s\S]*?)\)\]|\{([\s\S]*?)\}|\[([^()\[\]]*?)\])/g;
   let m: RegExpExecArray | null;
-  while ((m = dbRegex.exec(diagCode)) !== null) {
-    const rawContent = m[2].replace(/<br\s*\/?>/gi, '\n').replace(/['"]/g, '').trim();
+  while ((m = nodeDefRegex.exec(diagCode)) !== null) {
+    const id = m[1];
+    if (nodesMap.has(id)) continue;
+    const dbText = m[2];
+    const diamondText = m[3];
+    const rectText = m[4];
+    const isDb = dbText !== undefined;
+    const isDiamond = diamondText !== undefined;
+    const rawContent = (dbText || diamondText || rectText || '').replace(/<br\s*\/?>/gi, '\n').replace(/['"]/g, '').trim();
     const lines = rawContent.split('\n').map((s) => s.trim()).filter(Boolean);
-    nodesMap.set(m[1], {
-      id: m[1],
-      label: lines[0] || m[1],
+    const label = lines[0] || id;
+    const isUser = /user|clinic|doctor|clinician|human|analyst|operator|client/i.test(label);
+    nodesMap.set(id, {
+      id,
+      label,
       subtitle: lines.slice(1).join(' · ') || undefined,
-      type: 'database',
-      metadata: {},
+      type: isDb ? 'database' : (isUser ? 'user' : 'service'),
+      metadata: isDiamond ? { isDecision: true } : {},
     });
-  }
-
-  // 2. Decision diamonds: id{content}
-  const diamondRegex = /([A-Za-z0-9_]+)\{([\s\S]*?)\}/g;
-  while ((m = diamondRegex.exec(diagCode)) !== null) {
-    if (!nodesMap.has(m[1])) {
-      const rawContent = m[2].replace(/<br\s*\/?>/gi, '\n').replace(/['"]/g, '').trim();
-      const lines = rawContent.split('\n').map((s) => s.trim()).filter(Boolean);
-      nodesMap.set(m[1], {
-        id: m[1],
-        label: lines[0] || m[1],
-        subtitle: lines.slice(1).join(' · ') || undefined,
-        type: 'service',
-        metadata: { isDecision: true },
-      });
-    }
-  }
-
-  // 3. Standard nodes: id[content]
-  const rectRegex = /([A-Za-z0-9_]+)\[([^()\[\]]*?)\]/g;
-  while ((m = rectRegex.exec(diagCode)) !== null) {
-    if (!nodesMap.has(m[1])) {
-      const rawContent = m[2].replace(/<br\s*\/?>/gi, '\n').replace(/['"]/g, '').trim();
-      const lines = rawContent.split('\n').map((s) => s.trim()).filter(Boolean);
-      const label = lines[0] || m[1];
-      const isUser = /user|clinic|doctor|clinician|human|analyst|operator|client/i.test(label);
-      nodesMap.set(m[1], {
-        id: m[1],
-        label: label,
-        subtitle: lines.slice(1).join(' · ') || undefined,
-        type: isUser ? 'user' : 'service',
-        metadata: {},
-      });
-    }
   }
 
   // Filter out comments and subgraphs before edge parsing
@@ -248,7 +227,7 @@ export async function renderMermaidDiagrams(
       el.style.boxShadow = 'none';
       el.style.display = 'block';
       el.style.width = '100%';
-      el.style.minHeight = '520px';
+      el.style.minHeight = '580px';
       el.innerHTML = '';
 
       let root = (el as any)._reactRoot;
@@ -262,7 +241,7 @@ export async function renderMermaidDiagrams(
       root.render(
         createElement(ArchitectureFlow, {
           initialGraph: parsedGraph,
-          height: '520px',
+          height: '580px',
           showControls: true,
           showMinimap: true,
           showToolbar: false, // Never force the admin toolbar in lesson view

@@ -145,8 +145,8 @@ const ArchitectureFlowInner: React.FC<ArchitectureFlowProps> = ({
 
         // 4. Center and fit view smoothly
         setTimeout(() => {
-          fitView({ padding: 0.22, duration: 450 });
-        }, 80);
+          fitView({ padding: 0.28, duration: 350 });
+        }, 150);
       } catch (err: any) {
         console.error('Failed to load diagram:', err);
         setError(err.message || 'Error calculating layout or fetching graph.');
@@ -211,6 +211,7 @@ const ArchitectureFlowInner: React.FC<ArchitectureFlowProps> = ({
             nodeTypes={nodeTypes}
             onNodeClick={handleNodeClick}
             fitView
+            fitViewOptions={{ padding: 0.28, minZoom: 0.2, maxZoom: 1.0 }}
             nodesDraggable={true}
             elementsSelectable={true}
             minZoom={0.2}
