@@ -33,8 +33,11 @@ export function Sidebar({ classes, refreshKey, mobileOpen, onMobileClose }: Side
   const { user, logout } = useAuth();
   const classList = Object.values(classes).sort((a, b) => a.id - b.id);
 
+  const isCoursesOpen = location.pathname === '/curriculum' || location.pathname.startsWith('/class/');
+
   const isActive = (to: string) => {
     if (to === '/dashboard') return location.pathname === '/dashboard' || location.pathname === '/overview';
+    if (to === '/curriculum') return isCoursesOpen;
     return location.pathname.startsWith(to);
   };
 
@@ -77,53 +80,55 @@ export function Sidebar({ classes, refreshKey, mobileOpen, onMobileClose }: Side
         ))}
       </nav>
 
-      {/* Classes Progress Stepper */}
-      <nav className="sidebar-nav">
-        <div className="sidebar-classes-header">
-          <span className="sidebar-section-label">Course Track</span>
-          <span className="sidebar-classes-badge">{completedCount} / {classList.length}</span>
-        </div>
+      {/* Classes Progress Stepper - only show when Courses are open */}
+      {isCoursesOpen && (
+        <nav className="sidebar-nav">
+          <div className="sidebar-classes-header">
+            <span className="sidebar-section-label">Course Track</span>
+            <span className="sidebar-classes-badge">{completedCount} / {classList.length}</span>
+          </div>
 
-        <div className="sidebar-stepper">
-          {classList.map((cls) => {
-            const done = ProgressService.isClassCompleted(cls.id);
-            const isLocked = !ProgressService.isClassUnlocked(cls.id);
-            const isCurrent = location.pathname === `/class/${cls.id}`;
-            const isNext = !done && !isLocked && cls.id === upNextId;
+          <div className="sidebar-stepper">
+            {classList.map((cls) => {
+              const done = ProgressService.isClassCompleted(cls.id);
+              const isLocked = !ProgressService.isClassUnlocked(cls.id);
+              const isCurrent = location.pathname === `/class/${cls.id}`;
+              const isNext = !done && !isLocked && cls.id === upNextId;
 
-            return (
-              <Link
-                key={cls.id}
-                to={`/class/${cls.id}`}
-                className={`stepper-item ${isCurrent ? 'stepper-item--current' : ''} ${done ? 'stepper-item--done' : ''} ${isLocked ? 'stepper-item--locked' : ''} ${isNext ? 'stepper-item--next' : ''}`}
-                onClick={onMobileClose}
-                title={`Class ${cls.id}: ${cls.short} ${isLocked ? '(Locked)' : `(${CLASS_DURATIONS[cls.id] || '45m'})`}`}
-              >
-                {/* Timeline node */}
-                <div className="stepper-node">
-                  {done ? (
-                    <CheckCircle size={11} className="stepper-icon--done" />
-                  ) : isLocked ? (
-                    <Lock size={9} className="stepper-icon--locked" />
-                  ) : isNext ? (
-                    <span className="stepper-dot--next" />
-                  ) : (
-                    <span className="stepper-num">{String(cls.id).padStart(2, '0')}</span>
-                  )}
-                </div>
+              return (
+                <Link
+                  key={cls.id}
+                  to={`/class/${cls.id}`}
+                  className={`stepper-item ${isCurrent ? 'stepper-item--current' : ''} ${done ? 'stepper-item--done' : ''} ${isLocked ? 'stepper-item--locked' : ''} ${isNext ? 'stepper-item--next' : ''}`}
+                  onClick={onMobileClose}
+                  title={`Class ${cls.id}: ${cls.short} ${isLocked ? '(Locked)' : `(${CLASS_DURATIONS[cls.id] || '45m'})`}`}
+                >
+                  {/* Timeline node */}
+                  <div className="stepper-node">
+                    {done ? (
+                      <CheckCircle size={11} className="stepper-icon--done" />
+                    ) : isLocked ? (
+                      <Lock size={9} className="stepper-icon--locked" />
+                    ) : isNext ? (
+                      <span className="stepper-dot--next" />
+                    ) : (
+                      <span className="stepper-num">{String(cls.id).padStart(2, '0')}</span>
+                    )}
+                  </div>
 
-                {/* Title */}
-                <span className="stepper-title">{cls.short}</span>
+                  {/* Title */}
+                  <span className="stepper-title">{cls.short}</span>
 
-                {/* Right Status Indicator */}
-                {isLocked && <span className="stepper-pill--locked"><Lock size={8} /> LOCKED</span>}
-                {!isLocked && isNext && <span className="stepper-pill--next">UP NEXT</span>}
-                {!isLocked && !done && !isNext && <span className="stepper-dur">{CLASS_DURATIONS[cls.id] || '45m'}</span>}
-              </Link>
-            );
-          })}
-        </div>
-      </nav>
+                  {/* Right Status Indicator */}
+                  {isLocked && <span className="stepper-pill--locked"><Lock size={8} /> LOCKED</span>}
+                  {!isLocked && isNext && <span className="stepper-pill--next">UP NEXT</span>}
+                  {!isLocked && !done && !isNext && <span className="stepper-dur">{CLASS_DURATIONS[cls.id] || '45m'}</span>}
+                </Link>
+              );
+            })}
+          </div>
+        </nav>
+      )}
 
       {/* User footer */}
       <div className="sidebar-footer">
