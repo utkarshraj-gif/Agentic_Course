@@ -222,9 +222,9 @@ export function CurriculumPage() {
     return (
       <div className="page">
         <div className="page-header">
-          <h1 className="page-title">Curriculum</h1>
+          <h1 className="page-title">Courses</h1>
         </div>
-        <div className="loading-state">Loading curriculum...</div>
+        <div className="loading-state">Loading courses...</div>
       </div>
     );
   }
@@ -241,7 +241,7 @@ export function CurriculumPage() {
     <div className="page">
       <div className="page-header">
         <div>
-          <h1 className="page-title">Curriculum</h1>
+          <h1 className="page-title">Courses</h1>
           <p className="page-subtitle">
             {overview.weeks.length} weeks · {totalClasses} classes · {progress.completed} completed
           </p>

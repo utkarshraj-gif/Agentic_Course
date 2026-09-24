@@ -218,7 +218,7 @@ export function ClassDetail() {
           <nav className="lesson-breadcrumb" aria-label="Breadcrumb">
             <Link to="/dashboard">Overview</Link>
             <span aria-hidden="true">/</span>
-            <Link to="/curriculum">Curriculum</Link>
+            <Link to="/curriculum">Courses</Link>
             <span aria-hidden="true">/</span>
             <span className="current" aria-current="page">Class {String(classId).padStart(2, '0')} (Locked)</span>
           </nav>
@@ -247,7 +247,7 @@ export function ClassDetail() {
                 Resume with Class {String(firstIncompletePrereq).padStart(2, '0')} <ArrowRight size={14} />
               </Link>
               <Link to="/curriculum" className="btn btn--outline">
-                View Curriculum
+                View Courses
               </Link>
             </div>
           </div>
@@ -269,7 +269,7 @@ export function ClassDetail() {
         <nav className="lesson-breadcrumb" aria-label="Breadcrumb">
           <Link to="/dashboard">Overview</Link>
           <span aria-hidden="true">/</span>
-          <Link to="/curriculum">Curriculum</Link>
+          <Link to="/curriculum">Courses</Link>
           <span aria-hidden="true">/</span>
           <span aria-current="page">Class {classId}</span>
         </nav>
@@ -649,7 +649,7 @@ export function ClassDetail() {
                   </Link>
                 ) : (
                   <Link to="/curriculum" className="btn btn--primary">
-                    🎓 Course Completed — Curriculum <ChevronLeft size={14} style={{ transform: 'rotate(180deg)' }} />
+                    🎓 Course Completed — Courses <ChevronLeft size={14} style={{ transform: 'rotate(180deg)' }} />
                   </Link>
                 )}
               </div>

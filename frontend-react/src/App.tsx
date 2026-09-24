@@ -44,7 +44,7 @@ function PageTitleManager() {
     } else if (path === '/dashboard' || path === '/overview') {
       title = 'Overview | Velloe Learns';
     } else if (path === '/curriculum') {
-      title = 'Curriculum | Velloe Learns';
+      title = 'Courses | Velloe Learns';
     } else if (path.startsWith('/class/')) {
       const id = path.split('/')[2];
       title = `Class ${id} | Velloe Learns`;

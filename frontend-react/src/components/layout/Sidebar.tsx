@@ -21,7 +21,7 @@ interface SidebarProps {
 
 const NAV_ITEMS = [
   { to: '/dashboard', label: 'Overview', icon: LayoutDashboard },
-  { to: '/curriculum', label: 'Curriculum', icon: BookOpen },
+  { to: '/curriculum', label: 'Courses', icon: BookOpen },
   { to: '/practice', label: 'Practice', icon: FlaskConical },
   { to: '/projects', label: 'Projects', icon: Layers },
   { to: '/skills', label: 'Skill Map', icon: Map },
@@ -80,7 +80,7 @@ export function Sidebar({ classes, refreshKey, mobileOpen, onMobileClose }: Side
       {/* Classes Progress Stepper */}
       <nav className="sidebar-nav">
         <div className="sidebar-classes-header">
-          <span className="sidebar-section-label">Curriculum Track</span>
+          <span className="sidebar-section-label">Course Track</span>
           <span className="sidebar-classes-badge">{completedCount} / {classList.length}</span>
         </div>
 
