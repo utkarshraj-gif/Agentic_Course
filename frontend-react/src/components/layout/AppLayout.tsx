@@ -56,6 +56,7 @@ export function AppLayout() {
       <Sidebar
         classes={overview?.classes || {}}
         refreshKey={refreshKey}
+        mobileOpen={mobileOpen}
         onMobileClose={() => setMobileOpen(false)}
       />
 

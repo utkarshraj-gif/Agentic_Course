@@ -15,6 +15,7 @@ interface ClassInfo {
 interface SidebarProps {
   classes: Record<string, ClassInfo>;
   refreshKey: number;
+  mobileOpen?: boolean;
   onMobileClose?: () => void;
 }
 
@@ -27,7 +28,7 @@ const NAV_ITEMS = [
   { to: '/search', label: 'Search', icon: Search },
 ];
 
-export function Sidebar({ classes, refreshKey, onMobileClose }: SidebarProps) {
+export function Sidebar({ classes, refreshKey, mobileOpen, onMobileClose }: SidebarProps) {
   const location = useLocation();
   const { user, logout } = useAuth();
   const classList = Object.values(classes).sort((a, b) => a.id - b.id);
@@ -50,7 +51,7 @@ export function Sidebar({ classes, refreshKey, onMobileClose }: SidebarProps) {
   };
 
   return (
-    <aside className="sidebar" role="navigation" aria-label="Main navigation">
+    <aside className={`sidebar ${mobileOpen ? 'sidebar--open' : ''}`} role="navigation" aria-label="Main navigation">
       {/* Brand - Links back to Landing Page */}
       <Link to="/" className="sidebar-brand" title="Back to Landing Page" onClick={onMobileClose}>
         <img src="/logo.png" alt="Velloe Logo" className="sidebar-brand-img" />

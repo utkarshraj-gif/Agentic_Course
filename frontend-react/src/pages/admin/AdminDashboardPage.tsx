@@ -231,10 +231,10 @@ export function AdminDashboardPage() {
                   >
                     Class {String(c.classId).padStart(2, '0')}
                   </span>
-                  <span style={{ width: '220px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', color: 'var(--text-main)', fontWeight: 500 }} title={c.title}>
+                  <span style={{ flex: '1 1 120px', maxWidth: '240px', minWidth: '80px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', color: 'var(--text-main)', fontWeight: 500 }} title={c.title}>
                     {c.title}
                   </span>
-                  <div className="progress-bar" style={{ flex: 1, height: '6px' }}>
+                  <div className="progress-bar" style={{ flex: '1 1 60px', height: '6px' }}>
                     <div
                       className="progress-fill"
                       style={{

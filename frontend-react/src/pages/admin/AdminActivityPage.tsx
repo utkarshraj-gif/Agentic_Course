@@ -192,7 +192,7 @@ export function AdminActivityPage() {
           ))}
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', position: 'relative', minWidth: '280px', flex: '1', maxWidth: '380px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', position: 'relative', minWidth: '200px', flex: '1 1 auto', maxWidth: '380px', width: '100%' }}>
           <Search size={16} style={{ position: 'absolute', left: '12px', color: 'var(--text-muted)' }} />
           <input
             type="text"
