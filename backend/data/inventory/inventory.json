@@ -1,0 +1,32 @@
+{
+ "SKU-GLV-001": {
+  "name": "Nitrile exam gloves (box of 100)",
+  "on_hand": 900,
+  "on_order": 0,
+  "unit_cost": 6.2
+ },
+ "SKU-MSK-014": {
+  "name": "Surgical masks (box of 50)",
+  "on_hand": 2600,
+  "on_order": 500,
+  "unit_cost": 4.1
+ },
+ "SKU-SYR-220": {
+  "name": "Syringe 5ml (pack of 100)",
+  "on_hand": 380,
+  "on_order": 0,
+  "unit_cost": 11.5
+ },
+ "SKU-GAU-310": {
+  "name": "Sterile gauze pads (pack of 200)",
+  "on_hand": 150,
+  "on_order": 200,
+  "unit_cost": 8.9
+ },
+ "SKU-SAN-505": {
+  "name": "Hand sanitizer 500ml",
+  "on_hand": 700,
+  "on_order": 0,
+  "unit_cost": 3.4
+ }
+}

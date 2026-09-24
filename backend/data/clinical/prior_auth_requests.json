@@ -1,0 +1,56 @@
+[
+  {
+    "request_id": "PA-1001",
+    "service": "MRI lumbar spine without contrast",
+    "service_code": "72148",
+    "policy_id": "MP-RAD-014",
+    "patient": {"name": "Maria Alvarez", "mrn": "MRN 00482913", "dob": "1979-04-12", "phone": "(555) 201-3344"},
+    "clinical_note": "Maria Alvarez (MRN 00482913, DOB 1979-04-12) presents with low back pain radiating to the left leg for 9 weeks. Completed 6 weeks of physical therapy and a trial of naproxen without improvement. Neuro exam: diminished left ankle reflex, strength 5/5. No fever, no bladder or bowel changes, no history of cancer. Patient is being considered for epidural steroid injection.",
+    "expected_decision": "approve"
+  },
+  {
+    "request_id": "PA-1002",
+    "service": "MRI lumbar spine without contrast",
+    "service_code": "72148",
+    "policy_id": "MP-RAD-014",
+    "patient": {"name": "James Okafor", "mrn": "MRN 00771204", "dob": "1990-09-30", "phone": "(555) 877-1020"},
+    "clinical_note": "James Okafor reports low back pain for 3 weeks after lifting boxes. Taking ibuprofen. No physical therapy yet. Neuro exam normal. No fever, no bladder or bowel changes, no history of cancer. Requests MRI for reassurance.",
+    "expected_decision": "pend"
+  },
+  {
+    "request_id": "PA-1003",
+    "service": "Semaglutide 0.5 mg weekly",
+    "service_code": "semaglutide",
+    "policy_id": "MP-RX-221",
+    "patient": {"name": "Robert Chen", "mrn": "MRN 00339876", "dob": "1968-01-22", "phone": "(555) 430-9987"},
+    "clinical_note": "Robert Chen has type 2 diabetes (E11.9). HbA1c 8.4% measured 30 days ago. On metformin 2000 mg daily for 7 months with inadequate control. No personal or family history of medullary thyroid carcinoma or MEN2. No history of pancreatitis.",
+    "expected_decision": "approve"
+  },
+  {
+    "request_id": "PA-1004",
+    "service": "Tirzepatide 5 mg weekly",
+    "service_code": "tirzepatide",
+    "policy_id": "MP-RX-221",
+    "patient": {"name": "Linda Park", "mrn": "MRN 00910442", "dob": "1975-06-03", "phone": "(555) 612-0045"},
+    "clinical_note": "Linda Park has type 2 diabetes (E11.65). HbA1c 9.1% measured 20 days ago. Metformin 1500 mg daily for 5 months. Family history of medullary thyroid carcinoma in her mother.",
+    "expected_decision": "deny"
+  },
+  {
+    "request_id": "PA-1005",
+    "service": "Home sleep apnea test",
+    "service_code": "G0399",
+    "policy_id": "MP-DX-042",
+    "patient": {"name": "Thomas Reed", "mrn": "MRN 00128833", "dob": "1961-11-17", "phone": "(555) 390-7712"},
+    "clinical_note": "Thomas Reed snores loudly with witnessed apneas. STOP-BANG score 6. Epworth 14. On chronic opioid therapy (oxycodone) for back pain. No neuromuscular disease.",
+    "expected_decision": "redirect"
+  },
+  {
+    "request_id": "PA-1006",
+    "service": "Arthroscopic partial meniscectomy, right knee",
+    "service_code": "29881",
+    "policy_id": "MP-SURG-087",
+    "patient": {"name": "Susan Miller", "mrn": "MRN 00655120", "dob": "1958-02-08", "phone": "(555) 745-2210"},
+    "clinical_note": "Susan Miller has right knee pain with occasional catching for 4 months. MRI shows degenerative medial meniscal tear. Weight-bearing radiographs show Kellgren-Lawrence grade 4 osteoarthritis. Completed 8 weeks of physical therapy.",
+    "expected_decision": "deny"
+  }
+]

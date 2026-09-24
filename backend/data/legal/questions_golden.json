@@ -1,0 +1,14 @@
+[
+  {"q": "What is our standard liability cap?", "relevant": ["playbook#1"], "filter": {"doc_type": "playbook"}},
+  {"q": "What liability cap does Acme propose?", "relevant": ["acme-saas-msa#3"], "filter": {"doc_id": "acme-saas-msa"}},
+  {"q": "How many days notice to avoid auto-renewal with Acme?", "relevant": ["acme-saas-msa#2"], "filter": {"doc_id": "acme-saas-msa"}},
+  {"q": "Can Acme terminate for convenience?", "relevant": ["acme-saas-msa#5"], "filter": {"doc_id": "acme-saas-msa"}},
+  {"q": "What breach notification deadline does our playbook require?", "relevant": ["playbook#6"], "filter": {"doc_type": "playbook"}},
+  {"q": "How long does the Northwind non-solicitation last?", "relevant": ["northwind-nda#4"], "filter": {"doc_id": "northwind-nda"}},
+  {"q": "Which law governs the Northwind NDA?", "relevant": ["northwind-nda#6"], "filter": {"doc_id": "northwind-nda"}},
+  {"q": "What insurance must Globex maintain?", "relevant": ["globex-services#6"], "filter": {"doc_id": "globex-services"}},
+  {"q": "Does the Globex liability cap exclude confidentiality breaches?", "relevant": ["globex-services#3"], "filter": {"doc_id": "globex-services"}},
+  {"q": "What late payment interest is acceptable under our playbook?", "relevant": ["playbook#5"], "filter": {"doc_type": "playbook"}},
+  {"q": "Who must indemnify for IP infringement under Globex?", "relevant": ["globex-services#4"], "filter": {"doc_id": "globex-services"}},
+  {"q": "What is the playbook position on non-solicitation duration?", "relevant": ["playbook#7"], "filter": {"doc_type": "playbook"}}
+]

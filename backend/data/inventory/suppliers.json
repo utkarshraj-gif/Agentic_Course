@@ -1,0 +1,40 @@
+[
+ {
+  "supplier_id": "SUP-MEDLINEX",
+  "name": "Medlinex Supply (synthetic)",
+  "skus": {
+   "SKU-GLV-001": 5.9,
+   "SKU-MSK-014": 3.9,
+   "SKU-SYR-220": 11.2,
+   "SKU-GAU-310": 8.7
+  },
+  "lead_time_weeks": 2,
+  "moq_units": 200,
+  "on_time_rate": 0.93
+ },
+ {
+  "supplier_id": "SUP-CAREPLUS",
+  "name": "CarePlus Distributors (synthetic)",
+  "skus": {
+   "SKU-GLV-001": 5.6,
+   "SKU-SYR-220": 10.4,
+   "SKU-SAN-505": 3.1,
+   "SKU-GAU-310": 8.1
+  },
+  "lead_time_weeks": 4,
+  "moq_units": 500,
+  "on_time_rate": 0.81
+ },
+ {
+  "supplier_id": "SUP-QUICKMED",
+  "name": "QuickMed Express (synthetic)",
+  "skus": {
+   "SKU-SAN-505": 3.6,
+   "SKU-MSK-014": 4.4,
+   "SKU-SYR-220": 12.0
+  },
+  "lead_time_weeks": 1,
+  "moq_units": 100,
+  "on_time_rate": 0.97
+ }
+]

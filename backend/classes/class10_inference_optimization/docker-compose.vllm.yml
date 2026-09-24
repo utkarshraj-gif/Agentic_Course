@@ -1,0 +1,25 @@
+# Class 10 - Serve an open model with vLLM (OpenAI-compatible API on :8000).
+# Requires an NVIDIA GPU host with the NVIDIA Container Toolkit.
+#   docker compose -f docker-compose.vllm.yml up
+#   export LLM_BASE_URL=http://localhost:8000/v1 OPENAI_API_KEY=dummy LLM_MODEL=meta-llama/Llama-3.1-8B-Instruct
+services:
+  vllm:
+    image: vllm/vllm-openai:latest          # pin a specific tag in production
+    ports: ["8000:8000"]
+    environment:
+      - HUGGING_FACE_HUB_TOKEN=${HF_TOKEN}
+    volumes:
+      - ~/.cache/huggingface:/root/.cache/huggingface
+    command: >
+      --model meta-llama/Llama-3.1-8B-Instruct
+      --max-model-len 8192
+      --gpu-memory-utilization 0.90
+      --enable-prefix-caching
+      --max-num-seqs 128
+      --enable-lora --max-loras 4
+    # Quantised variant for smaller GPUs:
+    #   --model <awq-or-gptq-checkpoint> --quantization awq
+    deploy:
+      resources:
+        reservations:
+          devices: [{driver: nvidia, count: 1, capabilities: [gpu]}]

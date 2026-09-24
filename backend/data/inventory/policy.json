@@ -1,0 +1,7 @@
+{
+ "service_level": 0.95,
+ "review_period_weeks": 1,
+ "holding_cost_pct_per_week": 0.004,
+ "budget_usd": 8000,
+ "approval_threshold_usd": 5000
+}

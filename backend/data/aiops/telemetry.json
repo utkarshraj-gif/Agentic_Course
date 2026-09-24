@@ -1,0 +1,635 @@
+{
+ "timestamps": [
+  "2026-09-18T10:00:00Z",
+  "2026-09-18T10:05:00Z",
+  "2026-09-18T10:10:00Z",
+  "2026-09-18T10:15:00Z",
+  "2026-09-18T10:20:00Z",
+  "2026-09-18T10:25:00Z",
+  "2026-09-18T10:30:00Z",
+  "2026-09-18T10:35:00Z",
+  "2026-09-18T10:40:00Z",
+  "2026-09-18T10:45:00Z",
+  "2026-09-18T10:50:00Z",
+  "2026-09-18T10:55:00Z"
+ ],
+ "topology": {
+  "checkout-api": {
+   "tier": 1,
+   "owner": "team-checkout",
+   "depends_on": [
+    "payments-svc",
+    "inventory-svc"
+   ]
+  },
+  "payments-svc": {
+   "tier": 1,
+   "owner": "team-payments",
+   "depends_on": [
+    "postgres-payments"
+   ]
+  },
+  "inventory-svc": {
+   "tier": 2,
+   "owner": "team-inventory",
+   "depends_on": [
+    "redis-cache"
+   ]
+  },
+  "postgres-payments": {
+   "tier": 1,
+   "owner": "team-dba",
+   "depends_on": []
+  },
+  "redis-cache": {
+   "tier": 2,
+   "owner": "team-platform",
+   "depends_on": []
+  },
+  "batch-worker": {
+   "tier": 3,
+   "owner": "team-data",
+   "depends_on": []
+  }
+ },
+ "metrics": {
+  "checkout-api": {
+   "p99_latency_ms": [
+    314.36,
+    308.83,
+    324.83,
+    306.32,
+    321.15,
+    315.7,
+    2293.92,
+    2401.78,
+    2289.0,
+    2384.07,
+    2296.77,
+    2301.77
+   ],
+   "error_rate_pct": [
+    0.4,
+    0.41,
+    0.38,
+    0.39,
+    0.41,
+    0.42,
+    6.55,
+    6.43,
+    6.81,
+    6.21,
+    6.73,
+    6.36
+   ],
+   "cpu_pct": [
+    43.4,
+    43.28,
+    44.14,
+    46.42,
+    43.56,
+    45.37,
+    45.63,
+    44.43,
+    45.21,
+    43.03,
+    43.02,
+    43.68
+   ],
+   "memory_pct": [
+    59.05,
+    57.58,
+    56.92,
+    58.5,
+    57.73,
+    56.84,
+    59.71,
+    59.15,
+    56.52,
+    58.43,
+    58.15,
+    60.18
+   ]
+  },
+  "payments-svc": {
+   "p99_latency_ms": [
+    184.13,
+    176.18,
+    188.64,
+    173.13,
+    178.53,
+    184.63,
+    5019.03,
+    5194.26,
+    4960.39,
+    5287.47,
+    5337.58,
+    5237.97
+   ],
+   "error_rate_pct": [
+    0.21,
+    0.2,
+    0.2,
+    0.2,
+    0.2,
+    0.2,
+    18.61,
+    18.8,
+    17.95,
+    18.3,
+    17.21,
+    18.36
+   ],
+   "cpu_pct": [
+    38.56,
+    39.87,
+    39.22,
+    37.18,
+    37.57,
+    38.64,
+    36.19,
+    37.85,
+    36.74,
+    36.54,
+    36.32,
+    39.02
+   ],
+   "memory_pct": [
+    50.07,
+    50.69,
+    51.43,
+    53.93,
+    49.82,
+    51.74,
+    52.26,
+    53.99,
+    53.66,
+    53.89,
+    50.85,
+    51.56
+   ],
+   "db_pool_in_use": [
+    12.0,
+    12.0,
+    12.0,
+    12.0,
+    12.0,
+    12.0,
+    5.0,
+    5.0,
+    5.0,
+    5.0,
+    5.0,
+    5.0
+   ],
+   "db_pool_max": [
+    50,
+    50,
+    50,
+    50,
+    50,
+    50,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5
+   ]
+  },
+  "inventory-svc": {
+   "p99_latency_ms": [
+    138.17,
+    140.93,
+    146.34,
+    142.67,
+    140.22,
+    141.65,
+    142.47,
+    133.76,
+    145.59,
+    143.92,
+    145.24,
+    144.17
+   ],
+   "error_rate_pct": [
+    0.1,
+    0.1,
+    0.1,
+    0.1,
+    0.1,
+    0.1,
+    0.1,
+    0.1,
+    0.1,
+    0.1,
+    0.1,
+    0.1
+   ],
+   "cpu_pct": [
+    28.8,
+    29.59,
+    28.58,
+    31.12,
+    30.34,
+    28.95,
+    29.26,
+    29.54,
+    29.59,
+    28.87,
+    31.05,
+    31.48
+   ],
+   "memory_pct": [
+    40,
+    46,
+    52,
+    58,
+    64,
+    70,
+    76,
+    82,
+    87,
+    91,
+    94,
+    97
+   ]
+  },
+  "postgres-payments": {
+   "active_connections": [
+    59.8,
+    59.9,
+    57.52,
+    57.61,
+    59.06,
+    58.59,
+    30.99,
+    28.98,
+    28.57,
+    31.35,
+    30.08,
+    28.94
+   ],
+   "cpu_pct": [
+    35.15,
+    33.34,
+    35.1,
+    36.67,
+    36.27,
+    35.69,
+    34.16,
+    34.53,
+    33.83,
+    35.95,
+    35.11,
+    35.98
+   ],
+   "replication_lag_s": [
+    0.29,
+    0.29,
+    0.31,
+    0.31,
+    0.31,
+    0.31,
+    0.31,
+    0.31,
+    0.29,
+    0.3,
+    0.3,
+    0.29
+   ]
+  },
+  "redis-cache": {
+   "hit_rate_pct": [
+    91.47,
+    93.88,
+    93.69,
+    97.85,
+    100.38,
+    95.49,
+    100.2,
+    100.69,
+    100.37,
+    94.7,
+    93.32,
+    93.38
+   ],
+   "memory_pct": [
+    59.15,
+    59.2,
+    61.76,
+    63.44,
+    63.08,
+    60.87,
+    61.93,
+    62.83,
+    58.47,
+    61.98,
+    63.5,
+    62.72
+   ]
+  },
+  "batch-worker": {
+   "disk_used_pct": [
+    71,
+    74,
+    77,
+    80,
+    83,
+    86,
+    88,
+    90,
+    92,
+    94,
+    95,
+    96
+   ],
+   "cpu_pct": [
+    22.55,
+    21.95,
+    21.29,
+    22.64,
+    21.63,
+    22.66,
+    23.04,
+    21.77,
+    21.78,
+    22.98,
+    22.49,
+    21.27
+   ]
+  }
+ },
+ "deploys": [
+  {
+   "service": "payments-svc",
+   "version": "v2.14.0",
+   "ts": "2026-09-18T10:27:00Z",
+   "author": "ci-bot",
+   "change": "Refactor DB client; set HikariCP maximumPoolSize from 50 to 5 in application.yaml",
+   "previous_version": "v2.13.4"
+  },
+  {
+   "service": "inventory-svc",
+   "version": "v5.2.1",
+   "ts": "2026-09-17T16:10:00Z",
+   "author": "dev.rao",
+   "change": "Add in-process product cache (no eviction policy)",
+   "previous_version": "v5.2.0"
+  },
+  {
+   "service": "checkout-api",
+   "version": "v9.8.0",
+   "ts": "2026-09-16T09:00:00Z",
+   "author": "ci-bot",
+   "change": "Copy changes on checkout page",
+   "previous_version": "v9.7.3"
+  }
+ ],
+ "logs": [
+  {
+   "ts": "2026-09-18T10:00:00Z",
+   "service": "payments-svc",
+   "level": "INFO",
+   "msg": "POST /v1/charge 200 in 142ms"
+  },
+  {
+   "ts": "2026-09-18T10:05:00Z",
+   "service": "payments-svc",
+   "level": "INFO",
+   "msg": "POST /v1/charge 200 in 142ms"
+  },
+  {
+   "ts": "2026-09-18T10:10:00Z",
+   "service": "payments-svc",
+   "level": "INFO",
+   "msg": "POST /v1/charge 200 in 142ms"
+  },
+  {
+   "ts": "2026-09-18T10:15:00Z",
+   "service": "payments-svc",
+   "level": "INFO",
+   "msg": "POST /v1/charge 200 in 142ms"
+  },
+  {
+   "ts": "2026-09-18T10:20:00Z",
+   "service": "payments-svc",
+   "level": "INFO",
+   "msg": "POST /v1/charge 200 in 142ms"
+  },
+  {
+   "ts": "2026-09-18T10:25:00Z",
+   "service": "payments-svc",
+   "level": "INFO",
+   "msg": "POST /v1/charge 200 in 142ms"
+  },
+  {
+   "ts": "2026-09-18T10:30:00Z",
+   "service": "payments-svc",
+   "level": "ERROR",
+   "msg": "HikariPool-1 - Connection is not available, request timed out after 30000ms (total=5, active=5, idle=0, waiting=143)"
+  },
+  {
+   "ts": "2026-09-18T10:30:00Z",
+   "service": "payments-svc",
+   "level": "ERROR",
+   "msg": "POST /v1/charge 503 upstream timeout acquiring DB connection"
+  },
+  {
+   "ts": "2026-09-18T10:30:00Z",
+   "service": "checkout-api",
+   "level": "WARN",
+   "msg": "payments-svc call failed: 503 Service Unavailable; retry 1/3"
+  },
+  {
+   "ts": "2026-09-18T10:35:00Z",
+   "service": "payments-svc",
+   "level": "ERROR",
+   "msg": "HikariPool-1 - Connection is not available, request timed out after 30000ms (total=5, active=5, idle=0, waiting=143)"
+  },
+  {
+   "ts": "2026-09-18T10:35:00Z",
+   "service": "payments-svc",
+   "level": "ERROR",
+   "msg": "POST /v1/charge 503 upstream timeout acquiring DB connection"
+  },
+  {
+   "ts": "2026-09-18T10:35:00Z",
+   "service": "checkout-api",
+   "level": "WARN",
+   "msg": "payments-svc call failed: 503 Service Unavailable; retry 1/3"
+  },
+  {
+   "ts": "2026-09-18T10:40:00Z",
+   "service": "payments-svc",
+   "level": "ERROR",
+   "msg": "HikariPool-1 - Connection is not available, request timed out after 30000ms (total=5, active=5, idle=0, waiting=143)"
+  },
+  {
+   "ts": "2026-09-18T10:40:00Z",
+   "service": "payments-svc",
+   "level": "ERROR",
+   "msg": "POST /v1/charge 503 upstream timeout acquiring DB connection"
+  },
+  {
+   "ts": "2026-09-18T10:40:00Z",
+   "service": "checkout-api",
+   "level": "WARN",
+   "msg": "payments-svc call failed: 503 Service Unavailable; retry 1/3"
+  },
+  {
+   "ts": "2026-09-18T10:40:00Z",
+   "service": "inventory-svc",
+   "level": "WARN",
+   "msg": "GC pause 1.8s; heap usage 87%; product cache entries=280000"
+  },
+  {
+   "ts": "2026-09-18T10:45:00Z",
+   "service": "payments-svc",
+   "level": "ERROR",
+   "msg": "HikariPool-1 - Connection is not available, request timed out after 30000ms (total=5, active=5, idle=0, waiting=143)"
+  },
+  {
+   "ts": "2026-09-18T10:45:00Z",
+   "service": "payments-svc",
+   "level": "ERROR",
+   "msg": "POST /v1/charge 503 upstream timeout acquiring DB connection"
+  },
+  {
+   "ts": "2026-09-18T10:45:00Z",
+   "service": "checkout-api",
+   "level": "WARN",
+   "msg": "payments-svc call failed: 503 Service Unavailable; retry 1/3"
+  },
+  {
+   "ts": "2026-09-18T10:45:00Z",
+   "service": "inventory-svc",
+   "level": "WARN",
+   "msg": "GC pause 1.9s; heap usage 91%; product cache entries=300000"
+  },
+  {
+   "ts": "2026-09-18T10:45:00Z",
+   "service": "batch-worker",
+   "level": "WARN",
+   "msg": "/var/log/batch usage 94%; rotated logs not compressed"
+  },
+  {
+   "ts": "2026-09-18T10:50:00Z",
+   "service": "payments-svc",
+   "level": "ERROR",
+   "msg": "HikariPool-1 - Connection is not available, request timed out after 30000ms (total=5, active=5, idle=0, waiting=143)"
+  },
+  {
+   "ts": "2026-09-18T10:50:00Z",
+   "service": "payments-svc",
+   "level": "ERROR",
+   "msg": "POST /v1/charge 503 upstream timeout acquiring DB connection"
+  },
+  {
+   "ts": "2026-09-18T10:50:00Z",
+   "service": "checkout-api",
+   "level": "WARN",
+   "msg": "payments-svc call failed: 503 Service Unavailable; retry 1/3"
+  },
+  {
+   "ts": "2026-09-18T10:50:00Z",
+   "service": "inventory-svc",
+   "level": "WARN",
+   "msg": "GC pause 1.10s; heap usage 94%; product cache entries=320000"
+  },
+  {
+   "ts": "2026-09-18T10:50:00Z",
+   "service": "batch-worker",
+   "level": "WARN",
+   "msg": "/var/log/batch usage 95%; rotated logs not compressed"
+  },
+  {
+   "ts": "2026-09-18T10:55:00Z",
+   "service": "payments-svc",
+   "level": "ERROR",
+   "msg": "HikariPool-1 - Connection is not available, request timed out after 30000ms (total=5, active=5, idle=0, waiting=143)"
+  },
+  {
+   "ts": "2026-09-18T10:55:00Z",
+   "service": "payments-svc",
+   "level": "ERROR",
+   "msg": "POST /v1/charge 503 upstream timeout acquiring DB connection"
+  },
+  {
+   "ts": "2026-09-18T10:55:00Z",
+   "service": "checkout-api",
+   "level": "WARN",
+   "msg": "payments-svc call failed: 503 Service Unavailable; retry 1/3"
+  },
+  {
+   "ts": "2026-09-18T10:55:00Z",
+   "service": "inventory-svc",
+   "level": "WARN",
+   "msg": "GC pause 1.11s; heap usage 97%; product cache entries=340000"
+  },
+  {
+   "ts": "2026-09-18T10:55:00Z",
+   "service": "batch-worker",
+   "level": "WARN",
+   "msg": "/var/log/batch usage 96%; rotated logs not compressed"
+  }
+ ],
+ "alerts": [
+  {
+   "alert_id": "AL-9001",
+   "ts": "2026-09-18T10:31:00Z",
+   "service": "checkout-api",
+   "name": "HighP99Latency",
+   "severity": "warning",
+   "value": "p99 2.4s > 1s"
+  },
+  {
+   "alert_id": "AL-9002",
+   "ts": "2026-09-18T10:31:30Z",
+   "service": "payments-svc",
+   "name": "High5xxRate",
+   "severity": "critical",
+   "value": "18% > 2%"
+  },
+  {
+   "alert_id": "AL-9003",
+   "ts": "2026-09-18T10:32:00Z",
+   "service": "checkout-api",
+   "name": "High5xxRate",
+   "severity": "critical",
+   "value": "6.5% > 2%"
+  },
+  {
+   "alert_id": "AL-9004",
+   "ts": "2026-09-18T10:33:00Z",
+   "service": "payments-svc",
+   "name": "HighP99Latency",
+   "severity": "warning",
+   "value": "p99 5.2s > 1s"
+  },
+  {
+   "alert_id": "AL-9005",
+   "ts": "2026-09-18T10:45:00Z",
+   "service": "inventory-svc",
+   "name": "MemoryHigh",
+   "severity": "warning",
+   "value": "memory 91% > 85%"
+  },
+  {
+   "alert_id": "AL-9006",
+   "ts": "2026-09-18T10:50:00Z",
+   "service": "batch-worker",
+   "name": "DiskAlmostFull",
+   "severity": "warning",
+   "value": "disk 95% > 90%"
+  },
+  {
+   "alert_id": "AL-9007",
+   "ts": "2026-09-18T10:31:45Z",
+   "service": "payments-svc",
+   "name": "High5xxRate",
+   "severity": "critical",
+   "value": "18% > 2% (duplicate)"
+  }
+ ]
+}

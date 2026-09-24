@@ -1,0 +1,25 @@
+# Local multi-agent stack:  docker compose -f projects/inventory_planner/docker-compose.yml up --build
+# Then:  curl localhost:8103/.well-known/agent-card.json
+x-agent: &agent
+  build: {context: ../.., dockerfile: projects/inventory_planner/Dockerfile}
+  image: inventory-agents:local
+  environment: &env
+    A2A_TOKEN: ${A2A_TOKEN:-dev-token}
+    OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+    FORECASTER_URL: http://forecaster:8101
+    SUPPLIER_URL: http://supplier:8102
+    PLANNER_URL: http://planner:8103
+services:
+  forecaster:
+    <<: *agent
+    environment: {<<: *env, AGENT: forecaster, PORT: "8101"}
+    ports: ["8101:8101"]
+  supplier:
+    <<: *agent
+    environment: {<<: *env, AGENT: supplier, PORT: "8102"}
+    ports: ["8102:8102"]
+  planner:
+    <<: *agent
+    environment: {<<: *env, AGENT: planner, PORT: "8103"}
+    ports: ["8103:8103"]
+    depends_on: [forecaster, supplier]

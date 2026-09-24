@@ -1,0 +1,22 @@
+[
+  {"contract": "acme-saas-msa", "section": "1. Fees and Payment", "clause_type": "payment_terms", "risk": "high"},
+  {"contract": "acme-saas-msa", "section": "2. Term and Renewal", "clause_type": "term_renewal", "risk": "high"},
+  {"contract": "acme-saas-msa", "section": "3. Limitation of Liability", "clause_type": "limitation_of_liability", "risk": "high"},
+  {"contract": "acme-saas-msa", "section": "4. Indemnification", "clause_type": "indemnification", "risk": "high"},
+  {"contract": "acme-saas-msa", "section": "5. Termination", "clause_type": "termination", "risk": "high"},
+  {"contract": "acme-saas-msa", "section": "6. Data Protection", "clause_type": "data_protection", "risk": "high"},
+  {"contract": "acme-saas-msa", "section": "7. Governing Law", "clause_type": "governing_law", "risk": "low"},
+  {"contract": "northwind-nda", "section": "1. Definition of Confidential Information", "clause_type": "confidentiality", "risk": "low"},
+  {"contract": "northwind-nda", "section": "2. Obligations", "clause_type": "confidentiality", "risk": "low"},
+  {"contract": "northwind-nda", "section": "3. Term", "clause_type": "confidentiality", "risk": "low"},
+  {"contract": "northwind-nda", "section": "4. Non-Solicitation", "clause_type": "non_solicitation", "risk": "medium"},
+  {"contract": "northwind-nda", "section": "5. Remedies", "clause_type": "other", "risk": "low"},
+  {"contract": "northwind-nda", "section": "6. Governing Law", "clause_type": "governing_law", "risk": "low"},
+  {"contract": "globex-services", "section": "1. Fees and Payment", "clause_type": "payment_terms", "risk": "low"},
+  {"contract": "globex-services", "section": "2. Term and Renewal", "clause_type": "term_renewal", "risk": "low"},
+  {"contract": "globex-services", "section": "3. Limitation of Liability", "clause_type": "limitation_of_liability", "risk": "low"},
+  {"contract": "globex-services", "section": "4. Indemnification", "clause_type": "indemnification", "risk": "low"},
+  {"contract": "globex-services", "section": "5. Termination", "clause_type": "termination", "risk": "low"},
+  {"contract": "globex-services", "section": "6. Insurance", "clause_type": "other", "risk": "low"},
+  {"contract": "globex-services", "section": "7. Governing Law", "clause_type": "governing_law", "risk": "low"}
+]

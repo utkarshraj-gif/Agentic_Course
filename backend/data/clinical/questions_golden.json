@@ -1,0 +1,12 @@
+[
+  {"q": "How long must conservative therapy last before a lumbar MRI is approved without red flags?", "answer_contains": ["6 weeks"], "relevant_doc": "mri-lumbar-spine"},
+  {"q": "Which red flags justify immediate lumbar spine MRI?", "answer_contains": ["cauda equina"], "relevant_doc": "mri-lumbar-spine"},
+  {"q": "What HbA1c level is required for GLP-1 approval?", "answer_contains": ["7.0%"], "relevant_doc": "glp1-type2-diabetes"},
+  {"q": "Is step therapy with metformin waived for any patients on GLP-1 agonists?", "answer_contains": ["cardiovascular"], "relevant_doc": "glp1-type2-diabetes"},
+  {"q": "What family history excludes a patient from GLP-1 therapy?", "answer_contains": ["medullary thyroid"], "relevant_doc": "glp1-type2-diabetes"},
+  {"q": "What is required for GLP-1 renewal after 12 months?", "answer_contains": ["0.5"], "relevant_doc": "glp1-type2-diabetes"},
+  {"q": "When is knee arthroscopy with meniscectomy not medically necessary?", "answer_contains": ["osteoarthritis"], "relevant_doc": "knee-arthroscopy"},
+  {"q": "Which osteoarthritis grade on radiographs blocks meniscectomy approval?", "answer_contains": ["grade 3 or 4"], "relevant_doc": "knee-arthroscopy"},
+  {"q": "When should in-lab polysomnography be used instead of a home sleep test?", "answer_contains": ["opioid"], "relevant_doc": "home-sleep-apnea-test"},
+  {"q": "What STOP-BANG score supports home sleep apnea testing?", "answer_contains": ["3 or higher"], "relevant_doc": "home-sleep-apnea-test"}
+]

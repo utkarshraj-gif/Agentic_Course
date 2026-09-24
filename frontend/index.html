@@ -1,0 +1,1805 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Building Enterprise AI Agents — Complete Course</title>
+    <meta name="description" content="A six-week, twelve-class hands-on program for building production-grade enterprise AI agents. Four capstone projects in healthcare, legal, IT operations, and supply chain.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        /* ========================================
+           DESIGN SYSTEM & CSS VARIABLES
+           ======================================== */
+        :root {
+            --bg-primary: #0a0a0b;
+            --bg-secondary: #111113;
+            --bg-tertiary: #18181b;
+            --bg-card: #1c1c1f;
+            --bg-card-hover: #222225;
+            --bg-elevated: #27272a;
+            --text-primary: #fafafa;
+            --text-secondary: #a1a1aa;
+            --text-tertiary: #71717a;
+            --text-muted: #52525b;
+            --border-primary: #27272a;
+            --border-secondary: #3f3f46;
+            --accent-cyan: #22d3ee;
+            --accent-cyan-dim: rgba(34, 211, 238, 0.1);
+            --accent-violet: #a78bfa;
+            --accent-violet-dim: rgba(167, 139, 250, 0.08);
+            --accent-amber: #fbbf24;
+            --accent-amber-dim: rgba(251, 191, 36, 0.1);
+            --accent-emerald: #34d399;
+            --accent-emerald-dim: rgba(52, 211, 153, 0.08);
+            --accent-rose: #fb7185;
+            --accent-rose-dim: rgba(251, 113, 133, 0.08);
+            --accent-blue: #60a5fa;
+            --accent-blue-dim: rgba(96, 165, 250, 0.08);
+            --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 24px;
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.3);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.4);
+            --shadow-lg: 0 8px 32px rgba(0,0,0,0.5);
+            --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-smooth: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-spring: 500ms cubic-bezier(0.34, 1.56, 0.64, 1);
+            --max-width: 1280px;
+        }
+
+        [data-theme="light"] {
+            --bg-primary: #ffffff;
+            --bg-secondary: #fafafa;
+            --bg-tertiary: #f4f4f5;
+            --bg-card: #ffffff;
+            --bg-card-hover: #f9f9fb;
+            --bg-elevated: #f4f4f5;
+            --text-primary: #09090b;
+            --text-secondary: #52525b;
+            --text-tertiary: #71717a;
+            --text-muted: #a1a1aa;
+            --border-primary: #e4e4e7;
+            --border-secondary: #d4d4d8;
+            --accent-cyan: #0891b2;
+            --accent-cyan-dim: rgba(8, 145, 178, 0.08);
+            --accent-violet: #7c3aed;
+            --accent-violet-dim: rgba(124, 58, 237, 0.06);
+            --accent-amber: #d97706;
+            --accent-amber-dim: rgba(217, 119, 6, 0.06);
+            --accent-emerald: #059669;
+            --accent-emerald-dim: rgba(5, 150, 105, 0.06);
+            --accent-rose: #e11d48;
+            --accent-rose-dim: rgba(225, 29, 72, 0.06);
+            --accent-blue: #2563eb;
+            --accent-blue-dim: rgba(37, 99, 235, 0.06);
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+            --shadow-lg: 0 8px 32px rgba(0,0,0,0.1);
+        }
+
+        /* ========================================
+           RESET & BASE
+           ======================================== */
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        ::selection {
+            background: var(--accent-cyan);
+            color: var(--bg-primary);
+        }
+
+        /* ========================================
+           NAVIGATION
+           ======================================== */
+        .nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            background: rgba(10, 10, 11, 0.8);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border-bottom: 1px solid var(--border-primary);
+            transition: var(--transition-smooth);
+        }
+
+        [data-theme="light"] .nav {
+            background: rgba(255, 255, 255, 0.85);
+        }
+
+        .nav-inner {
+            max-width: var(--max-width);
+            margin: 0 auto;
+            padding: 0 2rem;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: var(--text-primary);
+            font-weight: 700;
+            font-size: 1rem;
+            letter-spacing: -0.02em;
+        }
+
+        .nav-logo {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-violet));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            font-weight: 800;
+            color: #fff;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: var(--transition-fast);
+            position: relative;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: var(--text-primary);
+        }
+
+        .nav-links a.active::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--accent-cyan);
+            border-radius: 1px;
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .theme-toggle {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            border: 1px solid var(--border-primary);
+            background: transparent;
+            color: var(--text-secondary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition-fast);
+            font-size: 1.1rem;
+        }
+
+        .theme-toggle:hover {
+            background: var(--bg-elevated);
+            color: var(--text-primary);
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            border: 1px solid var(--border-primary);
+            background: transparent;
+            color: var(--text-secondary);
+            cursor: pointer;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        /* ========================================
+           HERO SECTION
+           ======================================== */
+        .hero {
+            position: relative;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8rem 2rem 6rem;
+            overflow: hidden;
+        }
+
+        .hero-grid {
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(34, 211, 238, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(34, 211, 238, 0.03) 1px, transparent 1px);
+            background-size: 60px 60px;
+            mask-image: radial-gradient(ellipse 80% 60% at 50% 40%, black 30%, transparent 100%);
+            -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 40%, black 30%, transparent 100%);
+        }
+
+        .hero-glow {
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: 0.15;
+            pointer-events: none;
+        }
+
+        .hero-glow-1 {
+            top: 10%;
+            left: 20%;
+            background: var(--accent-cyan);
+        }
+
+        .hero-glow-2 {
+            bottom: 20%;
+            right: 15%;
+            background: var(--accent-violet);
+        }
+
+        .hero-content {
+            position: relative;
+            max-width: 900px;
+            text-align: center;
+            z-index: 1;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 16px;
+            border-radius: 999px;
+            background: var(--accent-cyan-dim);
+            border: 1px solid rgba(34, 211, 238, 0.15);
+            color: var(--accent-cyan);
+            font-size: 0.8rem;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            margin-bottom: 2rem;
+            animation: fadeInDown 0.8s ease-out;
+        }
+
+        .hero-badge-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--accent-cyan);
+            animation: pulse-dot 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.5); }
+        }
+
+        .hero h1 {
+            font-size: clamp(2.8rem, 6vw, 5rem);
+            font-weight: 900;
+            line-height: 1.05;
+            letter-spacing: -0.03em;
+            margin-bottom: 1.5rem;
+            animation: fadeInUp 0.8s ease-out 0.1s backwards;
+        }
+
+        .hero h1 .gradient-text {
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-violet));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-subtitle {
+            font-size: clamp(1rem, 1.8vw, 1.25rem);
+            color: var(--text-secondary);
+            max-width: 640px;
+            margin: 0 auto 2.5rem;
+            line-height: 1.7;
+            animation: fadeInUp 0.8s ease-out 0.2s backwards;
+        }
+
+        .hero-stats {
+            display: flex;
+            justify-content: center;
+            gap: 3rem;
+            flex-wrap: wrap;
+            animation: fadeInUp 0.8s ease-out 0.3s backwards;
+        }
+
+        .hero-stat {
+            text-align: center;
+        }
+
+        .hero-stat-number {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--accent-cyan);
+            font-variant-numeric: tabular-nums;
+        }
+
+        .hero-stat-label {
+            font-size: 0.8rem;
+            color: var(--text-tertiary);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            font-weight: 600;
+            margin-top: 2px;
+        }
+
+        .hero-cta {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2.5rem;
+            animation: fadeInUp 0.8s ease-out 0.4s backwards;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            border-radius: var(--radius-md);
+            font-family: var(--font-sans);
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            border: none;
+            transition: var(--transition-smooth);
+        }
+
+        .btn-primary {
+            background: var(--accent-cyan);
+            color: #0a0a0b;
+        }
+
+        .btn-primary:hover {
+            background: #06b6d4;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 20px rgba(34, 211, 238, 0.3);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--text-primary);
+            border: 1px solid var(--border-secondary);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-elevated);
+            border-color: var(--text-tertiary);
+        }
+
+        /* ========================================
+           SECTIONS
+           ======================================== */
+        .section {
+            padding: 6rem 2rem;
+            max-width: var(--max-width);
+            margin: 0 auto;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .section-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--accent-cyan);
+            margin-bottom: 1rem;
+        }
+
+        .section-title {
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            line-height: 1.1;
+            margin-bottom: 1rem;
+        }
+
+        .section-subtitle {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* ========================================
+           CURRICULUM TIMELINE
+           ======================================== */
+        .curriculum-divider {
+            width: 100%;
+            height: 1px;
+            background: var(--border-primary);
+            margin: 6rem 0 0;
+        }
+
+        .week-group {
+            margin-bottom: 4rem;
+        }
+
+        .week-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-primary);
+        }
+
+        .week-number {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius-sm);
+            font-size: 0.85rem;
+            font-weight: 800;
+            color: #fff;
+            flex-shrink: 0;
+        }
+
+        .week-1 .week-number { background: linear-gradient(135deg, #22d3ee, #06b6d4); }
+        .week-2 .week-number { background: linear-gradient(135deg, #a78bfa, #7c3aed); }
+        .week-3 .week-number { background: linear-gradient(135deg, #fbbf24, #d97706); }
+        .week-4 .week-number { background: linear-gradient(135deg, #fb7185, #e11d48); }
+        .week-5 .week-number { background: linear-gradient(135deg, #60a5fa, #2563eb); }
+        .week-6 .week-number { background: linear-gradient(135deg, #34d399, #059669); }
+
+        .week-info h3 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            letter-spacing: -0.01em;
+        }
+
+        .week-info span {
+            font-size: 0.8rem;
+            color: var(--text-tertiary);
+        }
+
+        .class-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+            gap: 1rem;
+        }
+
+        .class-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-primary);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .class-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            opacity: 0;
+            transition: var(--transition-smooth);
+        }
+
+        .class-card:hover {
+            background: var(--bg-card-hover);
+            border-color: var(--border-secondary);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .class-card:hover::before {
+            opacity: 1;
+        }
+
+        .week-1 .class-card::before { background: linear-gradient(90deg, #22d3ee, #06b6d4); }
+        .week-2 .class-card::before { background: linear-gradient(90deg, #a78bfa, #7c3aed); }
+        .week-3 .class-card::before { background: linear-gradient(90deg, #fbbf24, #d97706); }
+        .week-4 .class-card::before { background: linear-gradient(90deg, #fb7185, #e11d48); }
+        .week-5 .class-card::before { background: linear-gradient(90deg, #60a5fa, #2563eb); }
+        .week-6 .class-card::before { background: linear-gradient(90deg, #34d399, #059669); }
+
+        .class-card-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+        }
+
+        .class-number {
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            padding: 2px 8px;
+            background: var(--bg-elevated);
+            border-radius: 4px;
+        }
+
+        .class-card h4 {
+            font-size: 1rem;
+            font-weight: 700;
+            letter-spacing: -0.01em;
+            margin-bottom: 0.5rem;
+            line-height: 1.3;
+        }
+
+        .class-card p {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+            margin-bottom: 1rem;
+        }
+
+        .class-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .class-tag {
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 3px 8px;
+            border-radius: 4px;
+            background: var(--bg-elevated);
+            color: var(--text-tertiary);
+            font-family: var(--font-mono);
+        }
+
+        /* ========================================
+           CAPSTONE PROJECTS
+           ======================================== */
+        .capstone-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+        }
+
+        .capstone-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-primary);
+            border-radius: var(--radius-xl);
+            padding: 2rem;
+            transition: var(--transition-smooth);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .capstone-card:hover {
+            border-color: var(--border-secondary);
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .capstone-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .capstone-healthcare .capstone-icon { background: var(--accent-cyan-dim); }
+        .capstone-legal .capstone-icon { background: var(--accent-violet-dim); }
+        .capstone-aiops .capstone-icon { background: var(--accent-amber-dim); }
+        .capstone-supply .capstone-icon { background: var(--accent-emerald-dim); }
+
+        .capstone-domain {
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 0.5rem;
+        }
+
+        .capstone-healthcare .capstone-domain { color: var(--accent-cyan); }
+        .capstone-legal .capstone-domain { color: var(--accent-violet); }
+        .capstone-aiops .capstone-domain { color: var(--accent-amber); }
+        .capstone-supply .capstone-domain { color: var(--accent-emerald); }
+
+        .capstone-card h3 {
+            font-size: 1.2rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            margin-bottom: 0.75rem;
+            line-height: 1.3;
+        }
+
+        .capstone-card > p {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 1.25rem;
+        }
+
+        .capstone-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .capstone-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.78rem;
+            color: var(--text-tertiary);
+        }
+
+        .capstone-meta-item span:first-child {
+            font-size: 0.9rem;
+        }
+
+        .capstone-techniques {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .capstone-tech-tag {
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-family: var(--font-mono);
+        }
+
+        .capstone-healthcare .capstone-tech-tag {
+            background: var(--accent-cyan-dim);
+            color: var(--accent-cyan);
+        }
+
+        .capstone-legal .capstone-tech-tag {
+            background: var(--accent-violet-dim);
+            color: var(--accent-violet);
+        }
+
+        .capstone-aiops .capstone-tech-tag {
+            background: var(--accent-amber-dim);
+            color: var(--accent-amber);
+        }
+
+        .capstone-supply .capstone-tech-tag {
+            background: var(--accent-emerald-dim);
+            color: var(--accent-emerald);
+        }
+
+        /* ========================================
+           TECH STACK SECTION
+           ======================================== */
+        .tech-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+        }
+
+        .tech-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-primary);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            transition: var(--transition-smooth);
+        }
+
+        .tech-card:hover {
+            background: var(--bg-card-hover);
+            border-color: var(--border-secondary);
+            transform: translateY(-2px);
+        }
+
+        .tech-card-icon {
+            font-size: 1.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .tech-card h4 {
+            font-size: 0.95rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .tech-card p {
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        /* ========================================
+           QUICK START SECTION
+           ======================================== */
+        .quickstart {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-primary);
+            border-radius: var(--radius-xl);
+            padding: 3rem;
+            margin-top: 2rem;
+        }
+
+        .quickstart h3 {
+            font-size: 1.3rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+        }
+
+        .quickstart > p {
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            font-size: 0.95rem;
+        }
+
+        .code-block {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-primary);
+            border-radius: var(--radius-md);
+            padding: 1.25rem 1.5rem;
+            font-family: var(--font-mono);
+            font-size: 0.82rem;
+            line-height: 1.8;
+            overflow-x: auto;
+            position: relative;
+        }
+
+        .code-block .comment {
+            color: var(--text-muted);
+        }
+
+        .code-block .command {
+            color: var(--accent-cyan);
+        }
+
+        .code-copy-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            padding: 4px 10px;
+            border-radius: 6px;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-primary);
+            color: var(--text-tertiary);
+            font-size: 0.7rem;
+            font-family: var(--font-sans);
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition-fast);
+        }
+
+        .code-copy-btn:hover {
+            color: var(--text-primary);
+            border-color: var(--border-secondary);
+        }
+
+        /* ========================================
+           FOOTER
+           ======================================== */
+        .footer {
+            border-top: 1px solid var(--border-primary);
+            padding: 3rem 2rem;
+            text-align: center;
+        }
+
+        .footer p {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+        }
+
+        .footer a {
+            color: var(--text-tertiary);
+            text-decoration: none;
+            transition: var(--transition-fast);
+        }
+
+        .footer a:hover {
+            color: var(--accent-cyan);
+        }
+
+        /* ========================================
+           ANIMATIONS
+           ======================================== */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(24px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* ========================================
+           CLASS DETAIL MODAL
+           ======================================== */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(8px);
+            z-index: 200;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-primary);
+            border-radius: var(--radius-xl);
+            max-width: 720px;
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+            padding: 2.5rem;
+            position: relative;
+            animation: fadeInUp 0.3s ease-out;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            border: 1px solid var(--border-primary);
+            background: transparent;
+            color: var(--text-secondary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            transition: var(--transition-fast);
+        }
+
+        .modal-close:hover {
+            background: var(--bg-elevated);
+            color: var(--text-primary);
+        }
+
+        .modal h2 {
+            font-size: 1.5rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            margin-bottom: 0.5rem;
+        }
+
+        .modal-meta {
+            font-size: 0.82rem;
+            color: var(--text-tertiary);
+            margin-bottom: 1.5rem;
+            font-weight: 500;
+        }
+
+        .modal h3 {
+            font-size: 1rem;
+            font-weight: 700;
+            margin: 1.5rem 0 0.75rem;
+            color: var(--accent-cyan);
+        }
+
+        .modal ul {
+            padding-left: 1.25rem;
+            margin-bottom: 1rem;
+        }
+
+        .modal li {
+            font-size: 0.88rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 0.5rem;
+        }
+
+        .modal p {
+            font-size: 0.88rem;
+            color: var(--text-secondary);
+            line-height: 1.7;
+            margin-bottom: 0.75rem;
+        }
+
+        .modal .run-cmd {
+            font-family: var(--font-mono);
+            font-size: 0.82rem;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-primary);
+            border-radius: var(--radius-sm);
+            padding: 0.75rem 1rem;
+            color: var(--accent-cyan);
+            margin-top: 1rem;
+        }
+
+        /* ========================================
+           RESPONSIVE
+           ======================================== */
+        @media (max-width: 968px) {
+            .capstone-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .tech-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .mobile-menu-btn {
+                display: flex;
+            }
+
+            .hero {
+                padding: 7rem 1.5rem 4rem;
+            }
+
+            .hero-stats {
+                gap: 2rem;
+            }
+
+            .hero-cta {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .class-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .tech-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .quickstart {
+                padding: 2rem 1.5rem;
+            }
+
+            .section {
+                padding: 4rem 1.5rem;
+            }
+        }
+
+        /* ========================================
+           CLASS DETAIL VIEW
+           ======================================== */
+        .crumbs { font-size: 0.85rem; color: var(--text-tertiary); padding-top: 2rem; display: flex; gap: 6px; flex-wrap: wrap; }
+        .crumbs a { color: var(--text-tertiary); text-decoration: none; transition: color 0.2s; }
+        .crumbs a:hover { color: var(--accent-cyan); }
+        .doc-head { padding-block: 1rem 1.5rem; display: flex; flex-direction: column; gap: 12px; border-bottom: 1px solid var(--border-primary); margin-bottom: 2rem; }
+        .doc-head h1 { font-size: clamp(2rem, 4vw, 3rem); font-weight: 800; letter-spacing: -0.02em; }
+        .metarow { display: flex; flex-wrap: wrap; gap: 8px 18px; font-size: 0.85rem; color: var(--text-secondary); align-items: center; }
+        .metarow .k { font-family: var(--font-mono); font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase; margin-right: 6px; color: var(--text-tertiary); }
+        .layout { display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 3rem; align-items: start; }
+        .toc { position: sticky; top: 100px; display: flex; flex-direction: column; gap: 4px; font-size: 0.85rem; }
+        .toc button { all: unset; cursor: pointer; color: var(--text-secondary); padding: 6px 12px; border-left: 2px solid var(--border-primary); line-height: 1.4; transition: var(--transition-fast); }
+        .toc button:hover, .toc button.active { color: var(--text-primary); border-color: var(--accent-cyan); }
+        .prose { min-width: 0; max-width: 820px; font-size: 1rem; line-height: 1.7; color: var(--text-primary); }
+        .prose h2 { font-size: 1.5rem; font-weight: 800; margin: 2.5rem 0 1rem; padding-top: 6px; scroll-margin-top: 100px; }
+        .prose h2:first-child { margin-top: 0; }
+        .prose h3 { font-size: 1.2rem; margin: 1.5rem 0 0.75rem; color: var(--accent-cyan); }
+        .prose p, .prose li { margin-bottom: 1rem; }
+        .prose ul, .prose ol { padding-left: 1.5rem; margin-bottom: 1rem; }
+        .prose li { margin-bottom: 0.5rem; }
+        .prose blockquote { margin: 1.5rem 0; padding: 1rem 1.25rem; border-radius: var(--radius-md); background: var(--accent-amber-dim); color: var(--text-primary); border-left: 4px solid var(--accent-amber); }
+        .prose blockquote p { margin: 0; font-size: 0.95rem; }
+        .prose code { font-family: var(--font-mono); font-size: 0.85em; background: var(--bg-elevated); border: 1px solid var(--border-primary); border-radius: 4px; padding: 0.15rem 0.4rem; color: var(--accent-cyan); }
+        .prose pre { background: var(--bg-card); border: 1px solid var(--border-primary); border-radius: var(--radius-md); padding: 1rem 1.25rem; overflow-x: auto; font-size: 0.85rem; line-height: 1.6; margin-bottom: 1.5rem; }
+        .prose pre code { background: none; border: 0; padding: 0; color: inherit; }
+        .tbl { overflow-x: auto; margin: 1.5rem 0; border: 1px solid var(--border-primary); border-radius: var(--radius-md); background: var(--bg-card); }
+        .tbl table { border-collapse: collapse; width: 100%; font-size: 0.9rem; }
+        .tbl th, .tbl td { text-align: left; padding: 12px 16px; border-bottom: 1px solid var(--border-primary); vertical-align: top; }
+        .tbl th { font-weight: 600; background: var(--bg-elevated); white-space: nowrap; }
+        .tbl tr:last-child td { border-bottom: 0; }
+        .mmd { margin: 1.5rem 0; padding: 1.5rem; background: var(--bg-card); border: 1px solid var(--border-primary); border-radius: var(--radius-md); overflow-x: auto; min-height: 120px; display: flex; justify-content: center; align-items: center; }
+        .mmd svg { max-width: 100%; height: auto; }
+        .mmd.loading::after { content: "Rendering diagram..."; color: var(--text-tertiary); font-size: 0.9rem; font-family: var(--font-mono); animation: pulse-dot 1.5s infinite; }
+        
+        /* Code Viewer */
+        .codebox { border: 1px solid var(--border-primary); border-radius: var(--radius-md); background: var(--bg-card); overflow: hidden; margin: 1.5rem 0; box-shadow: var(--shadow-sm); }
+        .ftabs { display: flex; gap: 4px; overflow-x: auto; padding: 8px 12px; border-bottom: 1px solid var(--border-primary); background: var(--bg-elevated); }
+        .ftabs button { all: unset; cursor: pointer; font: 500 0.8rem var(--font-mono); color: var(--text-secondary); padding: 6px 12px; border-radius: var(--radius-sm); white-space: nowrap; transition: var(--transition-fast); }
+        .ftabs button:hover { color: var(--text-primary); background: var(--bg-card-hover); }
+        .ftabs button[aria-selected="true"] { color: var(--text-primary); background: var(--bg-card); border: 1px solid var(--border-primary); border-bottom-color: transparent; margin-bottom: -9px; padding-bottom: 14px; }
+        .fhead { display: flex; justify-content: space-between; align-items: center; padding: 10px 16px; border-bottom: 1px solid var(--border-primary); font-size: 0.8rem; color: var(--text-tertiary); font-family: var(--font-mono); background: var(--bg-card); }
+        .codebox pre { margin: 0; max-height: 600px; overflow: auto; padding: 16px; font: 0.85rem/1.6 var(--font-mono); background: var(--bg-primary); tab-size: 4; border-radius: 0; border: none; }
+        
+        .pager { display: flex; justify-content: space-between; gap: 1rem; margin-top: 4rem; padding-top: 2rem; border-top: 1px solid var(--border-primary); flex-wrap: wrap; }
+        .pager a { display: flex; flex-direction: column; gap: 4px; text-decoration: none; padding: 1rem 1.25rem; border: 1px solid var(--border-primary); border-radius: var(--radius-md); background: var(--bg-card); max-width: 48%; min-width: 200px; flex: 1; transition: var(--transition-fast); }
+        .pager a:hover { border-color: var(--accent-cyan); transform: translateY(-2px); box-shadow: var(--shadow-md); }
+        .pager a.next { text-align: right; }
+        .pager small { font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.08em; }
+        .pager span { color: var(--text-primary); font-weight: 600; font-size: 1rem; }
+        
+        @media (max-width: 900px) {
+            .layout { grid-template-columns: 1fr; gap: 1.5rem; }
+            .toc { position: static; flex-direction: row; flex-wrap: wrap; gap: 8px; margin-bottom: 2rem; }
+            .toc button { border: 1px solid var(--border-primary); border-radius: 999px; padding: 6px 14px; border-left: 1px solid var(--border-primary); }
+            .toc button.active { background: var(--bg-elevated); }
+        }
+    </style>
+
+    <!-- External Dependencies -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+</head>
+<body>
+
+    <!-- ====== NAVIGATION ====== -->
+    <nav class="nav">
+        <div class="nav-inner">
+            <a href="#" class="nav-brand" onclick="scrollToSection('hero')">
+                <div class="nav-logo">AI</div>
+                Enterprise AI Agents
+            </a>
+            <ul class="nav-links">
+                <li><a href="#curriculum" class="active" onclick="scrollToSection('curriculum')">Curriculum</a></li>
+                <li><a href="#capstones" onclick="scrollToSection('capstones')">Capstones</a></li>
+                <li><a href="#stack" onclick="scrollToSection('stack')">Tech Stack</a></li>
+                <li><a href="#quickstart" onclick="scrollToSection('quickstart')">Quick Start</a></li>
+            </ul>
+            <div class="nav-actions">
+                <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">
+                    <span id="theme-icon">&#9790;</span>
+                </button>
+                <button class="mobile-menu-btn" onclick="toggleMobileMenu()" aria-label="Menu">&#9776;</button>
+            </div>
+        </div>
+    </nav>
+
+    <div id="landing-view">
+    <!-- ====== HERO ====== -->
+    <section class="hero" id="hero">
+        <div class="hero-grid"></div>
+        <div class="hero-glow hero-glow-1"></div>
+        <div class="hero-glow hero-glow-2"></div>
+        <div class="hero-content">
+            <div class="hero-badge">
+                <span class="hero-badge-dot"></span>
+                Offline-First &middot; Production-Ready
+            </div>
+            <h1>
+                Building<br>
+                <span class="gradient-text">Enterprise AI Agents</span>
+            </h1>
+            <p class="hero-subtitle">
+                A six-week, twelve-class hands-on program with runnable code. 
+                Four capstone projects in healthcare, legal, IT operations, and supply chain. 
+                Everything runs offline for free.
+            </p>
+            <div class="hero-stats">
+                <div class="hero-stat">
+                    <div class="hero-stat-number">12</div>
+                    <div class="hero-stat-label">Classes</div>
+                </div>
+                <div class="hero-stat">
+                    <div class="hero-stat-number">4</div>
+                    <div class="hero-stat-label">Capstones</div>
+                </div>
+                <div class="hero-stat">
+                    <div class="hero-stat-number">6</div>
+                    <div class="hero-stat-label">Weeks</div>
+                </div>
+                <div class="hero-stat">
+                    <div class="hero-stat-number">19</div>
+                    <div class="hero-stat-label">Tests</div>
+                </div>
+            </div>
+            <div class="hero-cta">
+                <a href="#curriculum" class="btn btn-primary" onclick="scrollToSection('curriculum')">
+                    Explore Curriculum &#8594;
+                </a>
+                <a href="#quickstart" class="btn btn-secondary" onclick="scrollToSection('quickstart')">
+                    Quick Start
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ====== CURRICULUM ====== -->
+    <div class="curriculum-divider"></div>
+    <section class="section" id="curriculum">
+        <div class="section-header reveal">
+            <div class="section-label">&#9671; Curriculum</div>
+            <h2 class="section-title">12 Classes. 6 Weeks.<br>Zero to Production.</h2>
+            <p class="section-subtitle">
+                Every class includes a lesson, worked example, architecture diagram, process-flow diagram, runnable code, and a lab.
+            </p>
+        </div>
+
+        <div id="curriculum-container"></div>
+    </section>
+
+    <!-- ====== CAPSTONES ====== -->
+    <div class="curriculum-divider"></div>
+    <section class="section" id="capstones">
+        <div class="section-header reveal">
+            <div class="section-label">&#9670; Capstone Projects</div>
+            <h2 class="section-title">4 Production-Grade<br>Agent Systems</h2>
+            <p class="section-subtitle">
+                Each capstone includes a full pipeline, REST API, Docker packaging, and automated tests.
+            </p>
+        </div>
+
+        <div class="capstone-grid" id="capstone-container"></div>
+    </section>
+
+    <!-- ====== TECH STACK ====== -->
+    <div class="curriculum-divider"></div>
+    <section class="section" id="stack">
+        <div class="section-header reveal">
+            <div class="section-label">&#9881; Technology</div>
+            <h2 class="section-title">Built on<br>Modern Foundations</h2>
+            <p class="section-subtitle">
+                A carefully chosen stack for building reliable, observable, and scalable AI agents.
+            </p>
+        </div>
+
+        <div class="tech-grid" id="tech-container"></div>
+    </section>
+
+    <!-- ====== QUICK START ====== -->
+    <div class="curriculum-divider"></div>
+    <section class="section" id="quickstart">
+        <div class="section-header reveal">
+            <div class="section-label">&#9654; Get Started</div>
+            <h2 class="section-title">Up and Running<br>in 60 Seconds</h2>
+        </div>
+
+        <div class="quickstart reveal">
+            <h3>Installation</h3>
+            <p>No API keys required. The entire course runs offline using deterministic heuristics.</p>
+
+            <div class="code-block">
+                <button class="code-copy-btn" onclick="copyCode(this)">Copy</button>
+                <span class="comment"># Create and activate virtual environment</span><br>
+                <span class="command">python -m venv .venv</span><br>
+                <span class="command">.\.venv\Scripts\Activate.ps1</span>
+                <br><br>
+                <span class="comment"># Install dependencies</span><br>
+                <span class="command">pip install -r requirements.txt</span>
+                <br><br>
+                <span class="comment"># Run all 19 tests</span><br>
+                <span class="command">python -m pytest -q tests</span>
+                <br><br>
+                <span class="comment"># Run all 12 class examples</span><br>
+                <span class="command">python -m classes.class01_intro_agentic_ai.example</span>
+                <br><br>
+                <span class="comment"># Run a capstone project</span><br>
+                <span class="command">python -m projects.clinical_prior_auth.run</span><br>
+                <span class="command">python -m projects.legal_contract_review.run</span><br>
+                <span class="command">python -m projects.aiops_agents.run</span><br>
+                <span class="command">python -m projects.inventory_planner.run</span>
+            </div>
+        </div>
+    </section>
+
+    </div> <!-- end landing-view -->
+    
+    <main id="class-detail-view" style="display: none;" class="section"></main>
+
+    <!-- ====== FOOTER ====== -->
+    <footer class="footer">
+        <p>
+            Building Enterprise AI Agents &mdash; Complete Course System<br>
+            All patients, contracts, telemetry and suppliers are <strong>synthetic</strong>. 
+            Nothing here is medical or legal advice.
+        </p>
+    </footer>
+
+    <!-- ====== MODAL ====== -->
+    <div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
+        <div class="modal" id="modal-content" onclick="event.stopPropagation()">
+            <button class="modal-close" onclick="document.getElementById('modal-overlay').classList.remove('active')">&times;</button>
+            <div id="modal-body"></div>
+        </div>
+    </div>
+
+    <!-- ====== DATA & SCRIPTS ====== -->
+
+    <script>
+    const API_BASE = 'http://127.0.0.1:8000/api';
+    let COURSE_DATA = null;
+    let CAPSTONES = null;
+    let mermaidSeq = 0;
+    
+    // Fallback tech stack (since it's not in the curriculum endpoint)
+    const TECH_STACK = [
+        { icon: "🧠", title: "LangGraph", description: "State machine agent orchestration with checkpointed workflows, human-in-the-loop interrupts, and parallel map-reduce." },
+        { icon: "🔍", title: "FAISS + Chroma + BM25", description: "Hybrid retrieval combining dense vector search, sparse keyword matching, and Reciprocal Rank Fusion." },
+        { icon: "🔧", title: "Pydantic v2", description: "Strict runtime type checking, structured LLM output extraction, tool validation, and JSON schema generation." },
+        { icon: "🔌", title: "Model Context Protocol", description: "FastMCP server/client for standardized tool, resource, and prompt interfaces across agent boundaries." },
+        { icon: "⚡", title: "FastAPI + Uvicorn", description: "High-performance REST APIs with auto-generated Swagger docs for every capstone project." },
+        { icon: "📊", title: "OpenTelemetry + Tracing", description: "Full observability with span-level tracing, latency monitoring, and integration with LangSmith and Opik." }
+    ];
+
+    async function fetchData() {
+        try {
+            const curRes = await fetch(API_BASE + '/curriculum');
+            COURSE_DATA = await curRes.json();
+            
+            const capRes = await fetch(API_BASE + '/capstones');
+            const capData = await capRes.json();
+            CAPSTONES = capData.capstones;
+        } catch (e) {
+            console.error("Failed to fetch data from API. Ensure backend is running.", e);
+        }
+    }
+
+    // ============ RENDER LANDING PAGE ============
+    function renderCurriculum() {
+        if (!COURSE_DATA) return;
+        const container = document.getElementById('curriculum-container');
+        container.innerHTML = COURSE_DATA.weeks.map(week => `
+            <div class="week-group week-${week.n} reveal">
+                <div class="week-header">
+                    <div class="week-number">W${week.n}</div>
+                    <div class="week-info">
+                        <h3>Week ${week.n}: ${week.title}</h3>
+                        <span>${week.classes.length} classes \u00B7 ${week.tools.join(', ')}</span>
+                    </div>
+                </div>
+                <div class="class-grid">
+                    ${week.classes.map(classId => {
+                        const cls = COURSE_DATA.classes[String(classId)];
+                        if (!cls) return '';
+                        const domain = cls.domain || (cls.meta && cls.meta.domain) || '';
+                        const tools = cls.tools || (cls.meta && cls.meta.tools) || [];
+                        return `
+                        <a href="#/classes/${classId}" class="class-card" style="text-decoration:none; color:inherit; display:block;">
+                            <div class="class-card-header">
+                                <span class="class-number">CLASS ${String(classId).padStart(2, '0')}</span>
+                            </div>
+                            <h4>${cls.title}</h4>
+                            <p>${domain}</p>
+                            <div class="class-tags">
+                                ${tools.map(tag => `<span class="class-tag">${tag}</span>`).join('')}
+                            </div>
+                        </a>
+                        `;
+                    }).join('')}
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function renderCapstones() {
+        if (!CAPSTONES) return;
+        const container = document.getElementById('capstone-container');
+        container.innerHTML = CAPSTONES.map((cap, i) => {
+            const icons = ["🏥", "⚖️", "🚨", "📦"];
+            const classes = ["capstone-healthcare", "capstone-legal", "capstone-aiops", "capstone-supply"];
+            const archItems = cap.architecture || [];
+            return `
+            <a href="#/capstones/${cap.slug}" class="capstone-card ${classes[i % classes.length]} reveal" style="text-decoration:none; color:inherit; display:block;">
+                <div class="capstone-icon">${icons[i % icons.length]}</div>
+                <div class="capstone-domain">${cap.domain}</div>
+                <h3>${cap.title}</h3>
+                <p>${cap.description}</p>
+                <div class="capstone-meta">
+                    <div class="capstone-meta-item">
+                        <span>⚙️</span> ${cap.pattern}
+                    </div>
+                    <div class="capstone-meta-item">
+                        <span>📊</span> ${cap.metric}
+                    </div>
+                </div>
+                <div class="capstone-techniques">
+                    ${archItems.map(t => `<span class="capstone-tech-tag">${t}</span>`).join('')}
+                </div>
+            </a>
+            `;
+        }).join('');
+    }
+
+    function renderTechStack() {
+        const container = document.getElementById('tech-container');
+        container.innerHTML = TECH_STACK.map(tech => `
+            <div class="tech-card reveal">
+                <div class="tech-card-icon">${tech.icon}</div>
+                <h4>${tech.title}</h4>
+                <p>${tech.description}</p>
+            </div>
+        `).join('');
+    }
+
+    // ============ CLIENT-SIDE ROUTER ============
+    async function handleRoute() {
+        const hash = window.location.hash;
+        const landingView = document.getElementById('landing-view');
+        const detailView = document.getElementById('class-detail-view');
+        
+        if (hash.startsWith('#/classes/')) {
+            const classId = hash.split('/')[2];
+            landingView.style.display = 'none';
+            detailView.style.display = 'block';
+            window.scrollTo(0, 0);
+            await renderClassDetail(classId);
+        } else if (hash.startsWith('#/capstones/')) {
+            const slug = hash.split('/')[2];
+            landingView.style.display = 'none';
+            detailView.style.display = 'block';
+            window.scrollTo(0, 0);
+            await renderCapstoneDetail(slug);
+        } else {
+            landingView.style.display = 'block';
+            detailView.style.display = 'none';
+            // Only scroll if we have a section hash like #curriculum
+            if (hash && !hash.startsWith('#/')) {
+                scrollToSection(hash.substring(1));
+            }
+        }
+    }
+    async function renderCapstoneDetail(slug) {
+        const detailView = document.getElementById('class-detail-view');
+        detailView.innerHTML = '<div style="text-align:center; padding: 4rem;"><span class="hero-badge-dot" style="display:inline-block; width:12px; height:12px; margin-right:8px;"></span> Loading capstone...</div>';
+        
+        try {
+            const res = await fetch(API_BASE + `/capstones/${slug}`);
+            if (!res.ok) throw new Error('Capstone not found');
+            const cap = await res.json();
+            
+            // Build TOC with code section if files exist
+            let tocHtml = cap.toc.map((t, i) => `<button type="button" data-t="s${i}">${t}</button>`).join('');
+            if (cap.files && cap.files.length > 0) {
+                tocHtml += `<button type="button" data-t="code-sec">Code (${cap.files.length} files)</button>`;
+            }
+            
+            // Build Code Viewer
+            let codeHtml = '';
+            if (cap.files && cap.files.length > 0) {
+                const tabs = cap.files.map((f, i) => `<button role="tab" aria-selected="${i===0 ? 'true' : 'false'}" data-i="${i}">${escapeHtml(f.name)}</button>`).join('');
+                codeHtml = `
+                <h2 id="code-sec">Code</h2>
+                <p>Every file below is the real, runnable source from the repository.</p>
+                <div class="codebox">
+                    <div class="ftabs" role="tablist" aria-label="Files">${tabs}</div>
+                    <div class="fhead">
+                        <span id="fname"></span>
+                        <button class="code-copy-btn" id="code-copy" type="button" style="padding:4px 12px;font-size:0.75rem;border-radius:6px;cursor:pointer;background:var(--bg-elevated);color:var(--text-secondary);border:1px solid var(--border-secondary);">Copy</button>
+                    </div>
+                    <pre><code id="fcode"></code></pre>
+                </div>
+                `;
+            }
+            
+            // Pager
+            const capIdx = CAPSTONES.findIndex(c => c.slug === slug || c.id === slug);
+            const prevCap = capIdx > 0 ? CAPSTONES[capIdx - 1] : null;
+            const nextCap = capIdx < CAPSTONES.length - 1 ? CAPSTONES[capIdx + 1] : null;
+            
+            let pagerHtml = '<div class="pager">';
+            if (prevCap) {
+                pagerHtml += `<a href="#/capstones/${prevCap.slug}"><small>← Previous Capstone</small><span>${prevCap.short || prevCap.title}</span></a>`;
+            } else {
+                pagerHtml += `<div></div>`;
+            }
+            if (nextCap) {
+                pagerHtml += `<a href="#/capstones/${nextCap.slug}" class="next"><small>Next Capstone →</small><span>${nextCap.short || nextCap.title}</span></a>`;
+            }
+            pagerHtml += '</div>';
+
+            detailView.innerHTML = `
+            <div class="crumbs">
+                <a href="#/">Home</a> / <a href="#/capstones">Capstones</a> / <span>${cap.domain}</span>
+            </div>
+            
+            <div class="doc-head">
+                <span class="eyebrow" style="font-family:var(--font-mono);font-size:12px;letter-spacing:0.08em;color:var(--accent-cyan);text-transform:uppercase;">CAPSTONE ${capIdx + 1} &middot; ${cap.domain}</span>
+                <h1>${cap.title}</h1>
+                <div class="metarow">
+                    <span><span class="k">Pattern</span> ${cap.pattern}</span>
+                    <span><span class="k">Result</span> ${cap.metric}</span>
+                </div>
+            </div>
+            
+            <div class="layout">
+                <nav class="toc" aria-label="On this page">
+                    ${tocHtml}
+                </nav>
+                <article class="prose">
+                    ${cap.html}
+                    ${codeHtml}
+                    <p style="font-size:0.85rem; color:var(--text-tertiary); background:var(--accent-cyan-dim); border-radius:var(--radius-md); padding:10px 14px; margin-top:18px;">Source folder: <code>${cap.folder}</code></p>
+                    ${pagerHtml}
+                </article>
+            </div>
+            `;
+            
+            // Setup components (same as class detail)
+            setupDetailViewComponents(detailView, cap);
+            
+        } catch (e) {
+            detailView.innerHTML = `<div style="padding: 4rem; text-align: center; color: var(--accent-rose);">Failed to load capstone data. Make sure the backend is running.</div>`;
+            console.error(e);
+        }
+    }
+
+    function setupDetailViewComponents(detailView, docData) {
+        // Wrap bare <table> elements in .tbl div for overflow handling
+        detailView.querySelectorAll('article.prose > table, article.prose table').forEach(table => {
+            if (!table.closest('.tbl')) {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'tbl';
+                table.parentNode.insertBefore(wrapper, table);
+                wrapper.appendChild(table);
+            }
+        });
+
+        // Wire TOC scroll spy
+        const tocNav = detailView.querySelector('.toc');
+        if (tocNav) {
+            tocNav.addEventListener('click', e => {
+                const btn = e.target.closest('button');
+                if (!btn) return;
+                const target = document.getElementById(btn.dataset.t);
+                if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+            
+            const tocBtns = [...tocNav.querySelectorAll('button[data-t]')];
+            const headingIds = tocBtns.map(b => b.dataset.t);
+            
+            const spyObserver = new IntersectionObserver(entries => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const activeId = entry.target.id;
+                        tocBtns.forEach(b => {
+                            b.classList.toggle('active', b.dataset.t === activeId);
+                        });
+                    }
+                });
+            }, { rootMargin: '-80px 0px -70% 0px', threshold: 0 });
+            
+            headingIds.forEach(hid => {
+                const el = document.getElementById(hid);
+                if (el) spyObserver.observe(el);
+            });
+        }
+
+        // Wire Code Viewer
+        if (docData.files && docData.files.length > 0) {
+            const codebox = detailView.querySelector('.codebox');
+            if (codebox) {
+                const codeEl = codebox.querySelector('#fcode');
+                const fnameEl = codebox.querySelector('#fname');
+                
+                function showFile(i) {
+                    const f = docData.files[i];
+                    codebox.querySelectorAll('.ftabs button').forEach(b => b.setAttribute('aria-selected', String(+b.dataset.i === i)));
+                    fnameEl.textContent = f.name + ' · ' + f.code.split('\\n').length + ' lines · ' + f.lang;
+                    codeEl.className = 'language-' + f.lang;
+                    codeEl.textContent = f.code;
+                    delete codeEl.dataset.highlighted;
+                    try { window.hljs && hljs.highlightElement(codeEl); } catch(e) {}
+                    codebox.querySelector('pre').scrollTop = 0;
+                }
+                
+                codebox.querySelector('.ftabs').addEventListener('click', e => {
+                    const b = e.target.closest('button');
+                    if (b) showFile(+b.dataset.i);
+                });
+                
+                const copyBtn = codebox.querySelector('#code-copy');
+                if (copyBtn) {
+                    copyBtn.addEventListener('click', async () => {
+                        const activeIdx = [...codebox.querySelectorAll('.ftabs button')].findIndex(b => b.getAttribute('aria-selected') === 'true');
+                        const f = docData.files[activeIdx >= 0 ? activeIdx : 0];
+                        try {
+                            await navigator.clipboard.writeText(f.code);
+                            copyBtn.textContent = 'Copied!';
+                        } catch(e) {
+                            copyBtn.textContent = 'Failed';
+                        }
+                        setTimeout(() => copyBtn.textContent = 'Copy', 1800);
+                    });
+                }
+                
+                showFile(0);
+            }
+        }
+        
+        // Render Mermaid diagrams with theme-aware variables
+        if (docData.diagrams && docData.diagrams.length > 0 && window.mermaid) {
+            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            mermaid.initialize({
+                startOnLoad: false,
+                theme: 'base',
+                fontFamily: 'Inter, system-ui, sans-serif',
+                flowchart: { htmlLabels: true, curve: 'basis', padding: 10 },
+                sequence: { mirrorActors: false, useMaxWidth: true },
+                themeVariables: {
+                    darkMode: isDark,
+                    fontFamily: 'Inter, system-ui, sans-serif',
+                    fontSize: '14px',
+                    primaryColor: isDark ? 'rgba(34,211,238,0.15)' : '#e7ecfb',
+                    primaryBorderColor: isDark ? '#22d3ee' : '#2f55d4',
+                    primaryTextColor: isDark ? '#fafafa' : '#141b26',
+                    lineColor: isDark ? '#a1a1aa' : '#5a6577',
+                    secondaryColor: isDark ? '#27272a' : '#eef1f5',
+                    tertiaryColor: isDark ? '#18181b' : '#f8f9fb',
+                    mainBkg: isDark ? 'rgba(34,211,238,0.15)' : '#e7ecfb',
+                    nodeBorder: isDark ? '#22d3ee' : '#2f55d4',
+                }
+            });
+            
+            for (const el of detailView.querySelectorAll('.mmd')) {
+                const diagCode = docData.diagrams[+el.dataset.d];
+                if (!diagCode) continue;
+                el.classList.add('loading');
+                const mermaidId = 'mmd' + (++mermaidSeq);
+                // Can't use async here without an async IIFE, doing promises
+                mermaid.render(mermaidId, diagCode).then(({svg}) => {
+                    el.innerHTML = svg;
+                    el.classList.remove('loading');
+                }).catch(e => {
+                    el.innerHTML = `<pre style="font-size:0.8rem;color:var(--text-tertiary);white-space:pre-wrap;">${escapeHtml(diagCode)}</pre>`;
+                    const errEl = document.getElementById('d' + mermaidId);
+                    if (errEl) errEl.remove();
+                    el.classList.remove('loading');
+                });
+            }
+        }
+        
+        // Syntax highlighting for inline code blocks in prose
+        detailView.querySelectorAll('article.prose pre code:not(#fcode)').forEach(block => {
+            try { hljs.highlightElement(block); } catch(e) {}
+        });
+    }
+    async function renderClassDetail(id) {
+        const detailView = document.getElementById('class-detail-view');
+        detailView.innerHTML = '<div style="text-align:center; padding: 4rem;"><span class="hero-badge-dot" style="display:inline-block; width:12px; height:12px; margin-right:8px;"></span> Loading class...</div>';
+        
+        try {
+            const res = await fetch(API_BASE + `/curriculum/classes/${id}`);
+            if (!res.ok) throw new Error('Class not found');
+            const cls = await res.json();
+            
+            // Build TOC with code section if files exist
+            let tocHtml = cls.toc.map((t, i) => `<button type="button" data-t="s${i}">${t}</button>`).join('');
+            if (cls.files && cls.files.length > 0) {
+                tocHtml += `<button type="button" data-t="code-sec">Code (${cls.files.length} files)</button>`;
+            }
+            
+            // Build Code Viewer (like the reference)
+            let codeHtml = '';
+            if (cls.files && cls.files.length > 0) {
+                const tabs = cls.files.map((f, i) => `<button role="tab" aria-selected="${i===0 ? 'true' : 'false'}" data-i="${i}">${escapeHtml(f.name)}</button>`).join('');
+                codeHtml = `
+                <h2 id="code-sec">Code</h2>
+                <p>Every file below is the real, runnable source from the repository.</p>
+                <div class="codebox">
+                    <div class="ftabs" role="tablist" aria-label="Files">${tabs}</div>
+                    <div class="fhead">
+                        <span id="fname"></span>
+                        <button class="code-copy-btn" id="code-copy" type="button" style="padding:4px 12px;font-size:0.75rem;border-radius:6px;cursor:pointer;background:var(--bg-elevated);color:var(--text-secondary);border:1px solid var(--border-secondary);">Copy</button>
+                    </div>
+                    <pre><code id="fcode"></code></pre>
+                </div>
+                `;
+            }
+            
+            // Pager
+            const prevId = parseInt(id) - 1;
+            const nextId = parseInt(id) + 1;
+            let prevCls = COURSE_DATA && COURSE_DATA.classes ? COURSE_DATA.classes[String(prevId)] : null;
+            let nextCls = COURSE_DATA && COURSE_DATA.classes ? COURSE_DATA.classes[String(nextId)] : null;
+            
+            let pagerHtml = '<div class="pager">';
+            if (prevCls) {
+                pagerHtml += `<a href="#/classes/${prevId}"><small>← Class ${prevId}</small><span>${prevCls.short || prevCls.title}</span></a>`;
+            } else {
+                pagerHtml += `<div></div>`;
+            }
+            if (nextCls) {
+                pagerHtml += `<a href="#/classes/${nextId}" class="next"><small>Class ${nextId} →</small><span>${nextCls.short || nextCls.title}</span></a>`;
+            }
+            pagerHtml += '</div>';
+
+            detailView.innerHTML = `
+            <div class="crumbs">
+                <a href="#/">Home</a> / <a href="#/curriculum">Curriculum</a> / <span>${cls.meta.week}</span>
+            </div>
+            
+            <div class="doc-head">
+                <h1>${cls.title}</h1>
+                <div class="metarow">
+                    <span><span class="k">Domain</span> ${cls.meta.domain}</span>
+                    <span><span class="k">Tools</span> ${cls.meta.tools.join(', ')}</span>
+                </div>
+            </div>
+            
+            <div class="layout">
+                <nav class="toc" aria-label="On this page">
+                    ${tocHtml}
+                </nav>
+                <article class="prose">
+                    ${cls.html}
+                    ${codeHtml}
+                    <p style="font-size:0.85rem; color:var(--text-tertiary); background:var(--accent-cyan-dim); border-radius:var(--radius-md); padding:10px 14px; margin-top:18px;">Source folder: <code>${cls.folder}</code></p>
+                    ${pagerHtml}
+                </article>
+            </div>
+            `;
+            
+            // Setup components
+            setupDetailViewComponents(detailView, cls);
+            
+        } catch (e) {
+            detailView.innerHTML = `<div style="padding: 4rem; text-align: center; color: var(--accent-rose);">Failed to load class data. Make sure the backend is running.</div>`;
+            console.error(e);
+        }
+    }
+
+    function escapeHtml(unsafe) {
+        return unsafe
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+
+    // ============ SMOOTH SCROLL ============
+    function scrollToSection(id) {
+        const el = document.getElementById(id);
+        if (el) {
+            el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    }
+
+    // ============ THEME TOGGLE ============
+    function toggleTheme() {
+        const html = document.documentElement;
+        const current = html.getAttribute('data-theme');
+        const next = current === 'dark' ? 'light' : 'dark';
+        html.setAttribute('data-theme', next);
+        document.getElementById('theme-icon').innerHTML = next === 'dark' ? '&#9790;' : '&#9728;';
+        localStorage.setItem('theme', next);
+        // Re-render class detail if open to update mermaid theme
+        if (window.location.hash.startsWith('#/classes/')) {
+            handleRoute();
+        }
+    }
+
+    // Load saved theme
+    (function() {
+        const saved = localStorage.getItem('theme');
+        if (saved) {
+            document.documentElement.setAttribute('data-theme', saved);
+            document.getElementById('theme-icon').innerHTML = saved === 'dark' ? '&#9790;' : '&#9728;';
+        }
+    })();
+
+    // ============ SCROLL REVEAL ============
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+            }
+        });
+    }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+
+    function observeRevealElements() {
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+    }
+
+    // ============ COPY CODE ============
+    function copyCode(btn) {
+        const block = btn.parentElement;
+        const text = block.innerText.replace('Copy', '').trim();
+        navigator.clipboard.writeText(text).then(() => {
+            btn.textContent = 'Copied!';
+            setTimeout(() => btn.textContent = 'Copy', 2000);
+        });
+    }
+
+    // ============ MOBILE MENU ============
+    function toggleMobileMenu() {
+        const links = document.querySelector('.nav-links');
+        links.style.display = links.style.display === 'flex' ? 'none' : 'flex';
+        links.style.position = 'absolute';
+        links.style.top = '64px';
+        links.style.left = '0';
+        links.style.right = '0';
+        links.style.flexDirection = 'column';
+        links.style.padding = '1rem 2rem';
+        links.style.background = 'var(--bg-secondary)';
+        links.style.borderBottom = '1px solid var(--border-primary)';
+        links.style.gap = '1rem';
+    }
+
+    // ============ INIT ============
+    async function init() {
+        await fetchData();
+        if (COURSE_DATA) renderCurriculum();
+        if (CAPSTONES) renderCapstones();
+        renderTechStack();
+        observeRevealElements();
+        
+        window.addEventListener('hashchange', handleRoute);
+        handleRoute(); // initial load
+    }
+    
+    init();
+    </script>
+</body>
+</html>
