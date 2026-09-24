@@ -11,13 +11,10 @@ import {
   Shield,
   Menu,
   X,
-  User,
   PanelLeftClose,
   PanelLeftOpen
 } from 'lucide-react';
 import { useAdminAuth } from '../../services/admin/AdminAuthContext';
-import { AdminService } from '../../services/admin/AdminService';
-import type { LearnerOverview } from '../../services/admin/AdminService';
 
 export function AdminLayout() {
   const { adminUser, adminLogout } = useAdminAuth();
@@ -27,13 +24,6 @@ export function AdminLayout() {
   const [isCollapsed, setIsCollapsed] = useState(() => {
     return localStorage.getItem('velloe_admin_sidebar_collapsed') === 'true';
   });
-  const [learnersList, setLearnersList] = useState<LearnerOverview[]>([]);
-
-  useEffect(() => {
-    AdminService.getLearners()
-      .then(data => setLearnersList(data))
-      .catch(() => {});
-  }, []);
 
   // Close mobile drawer on route change
   useEffect(() => {
@@ -66,10 +56,6 @@ export function AdminLayout() {
       return next;
     });
   };
-
-  const isLearnerDetail = location.pathname.startsWith('/admin/learners/');
-  const activeLearnerId = isLearnerDetail ? location.pathname.split('/')[3] : null;
-  const activeLearner = learnersList.find(l => l.id === activeLearnerId);
 
   const handleLogout = () => {
     adminLogout();
@@ -157,7 +143,6 @@ export function AdminLayout() {
           <div className="sidebar-section-label">Management</div>
           <NavLink
             to="/admin/dashboard"
-            title="Overview"
             className={({ isActive }) => `sidebar-nav-item ${isActive ? 'sidebar-nav-item--active' : ''}`}
             onClick={() => setMobileOpen(false)}
           >
@@ -239,53 +224,6 @@ export function AdminLayout() {
 
       {/* Main Content Area */}
       <main className="app-main" id="main-content">
-        {/* Global Admin Command & Learner Scope Bar */}
-        <header className="admin-command-bar">
-          <div className="admin-command-bar-left">
-            <div className="admin-scope-badge">
-              <span className="admin-scope-beacon" />
-              <span>
-                Scope: {activeLearner ? <strong>Individual Learner ({activeLearner.name})</strong> : 'Global Organization'}
-              </span>
-            </div>
-            {activeLearner && (
-              <button
-                className="btn btn--sm btn--outline"
-                style={{ padding: '2px 8px', fontSize: '0.72rem', height: '26px' }}
-                onClick={() => navigate('/admin/learners')}
-                title="Return to entire company roster"
-              >
-                Clear User Scope
-              </button>
-            )}
-          </div>
-
-          <div className="admin-command-bar-right">
-            <div className="admin-scope-select-wrap">
-              <User size={13} style={{ color: 'var(--text-muted)' }} />
-              <select
-                className="admin-scope-select"
-                value={activeLearnerId || ''}
-                onChange={(e) => {
-                  if (e.target.value) {
-                    navigate(`/admin/learners/${e.target.value}`);
-                  } else {
-                    navigate('/admin/learners');
-                  }
-                }}
-                aria-label="Inspect individual learner data"
-              >
-                <option value="">👤 Select Learner to Inspect Particular Data...</option>
-                {learnersList.map(l => (
-                  <option key={l.id} value={l.id}>
-                    {l.name} — {l.cohort}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-        </header>
-
         <Outlet />
       </main>
     </div>

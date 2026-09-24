@@ -3,7 +3,7 @@
 
 import { useEffect, useState, useCallback, useRef } from 'react';
 import type { FormEvent } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import {
   Users,
   Search,
@@ -12,7 +12,8 @@ import {
   X,
   Download,
   RefreshCw,
-  ExternalLink
+  ExternalLink,
+  User
 } from 'lucide-react';
 import { AdminService } from '../../services/admin/AdminService';
 import type {
@@ -32,6 +33,7 @@ const COHORTS = [
 ];
 
 export function AdminLearnersPage() {
+  const navigate = useNavigate();
   const [learners, setLearners] = useState<LearnerOverview[]>([]);
   const [selectedCohort, setSelectedCohort] = useState('All');
   const [searchTerm, setSearchTerm] = useState('');
@@ -142,7 +144,28 @@ export function AdminLearnersPage() {
           </p>
         </div>
 
-        <div style={{ display: 'flex', gap: '8px' }}>
+        <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
+          <div className="admin-scope-select-wrap" style={{ minWidth: '270px' }}>
+            <User size={13} style={{ color: 'var(--text-muted)' }} />
+            <select
+              className="admin-scope-select"
+              defaultValue=""
+              onChange={(e) => {
+                if (e.target.value) {
+                  navigate(`/admin/learners/${e.target.value}`);
+                }
+              }}
+              aria-label="Select Learner to Inspect Particular Data"
+            >
+              <option value="">👤 Select Learner to Inspect Particular Data...</option>
+              {learners.map((l) => (
+                <option key={l.id} value={l.id}>
+                  {l.name} — {l.cohort}
+                </option>
+              ))}
+            </select>
+          </div>
+
           <button onClick={() => fetchLearners(searchTerm, selectedCohort)} className="btn btn--outline btn--sm" style={{ gap: '6px' }}>
             <RefreshCw size={14} /> Refresh
           </button>
