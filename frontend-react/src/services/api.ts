@@ -1,7 +1,9 @@
 // src/services/api.ts
 // Central API configuration and user helper
 
-export const API_BASE = 'http://127.0.0.1:8000/api';
+export const API_BASE = (typeof window !== 'undefined' && (window.location.protocol === 'http:' || window.location.protocol === 'https:') && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1')
+  ? `${window.location.origin}/api`
+  : 'http://127.0.0.1:8000/api';
 
 export function getCurrentUserId(): string {
   try {
