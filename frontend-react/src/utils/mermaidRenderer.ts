@@ -190,6 +190,90 @@ export function parseMermaidFlowchart(diagCode: string): DiagramGraph {
   };
 }
 
+/**
+ * Parses Mermaid sequence diagrams into a generic graph schema for ELK + React Flow
+ */
+export function parseMermaidSequence(diagCode: string): DiagramGraph {
+  const nodesMap = new Map<string, DiagramNodeData>();
+  const edges: DiagramEdgeData[] = [];
+  let edgeSeq = 0;
+
+  // Extract participants: participant [id] as [label] OR participant [label]
+  // Also supports actor [id] as [label]
+  const participantRegex = /^\s*(?:participant|actor)\s+([A-Za-z0-9_]+)(?:\s+as\s+([^\n;]+))?/gmi;
+  let m: RegExpExecArray | null;
+  while ((m = participantRegex.exec(diagCode)) !== null) {
+    const id = m[1].trim();
+    const label = (m[2] ? m[2].trim() : id).replace(/['"]/g, '');
+    const isUser = /user|clinic|doctor|clinician|human|analyst|operator|client|patient|on-call/i.test(label);
+    const isDb = /db|store|faiss|trace|log|memory|ledger|llm/i.test(label);
+
+    nodesMap.set(id, {
+      id,
+      label,
+      type: isDb ? 'database' : (isUser ? 'user' : 'service'),
+      metadata: {},
+    });
+  }
+
+  // Extract messages: A->>B: text or A-->>B: text or A->B: text
+  const msgRegex = /([A-Za-z0-9_]+)\s*(-{1,2}>>?)\s*([A-Za-z0-9_]+)\s*:\s*([^\n;]+)/g;
+  while ((m = msgRegex.exec(diagCode)) !== null) {
+    const src = m[1].trim();
+    const arrow = m[2].trim();
+    const tgt = m[3].trim();
+    let text = m[4].replace(/['"]/g, '').trim();
+
+    // Ignore syntax words like alt, else, end, note, loop
+    if (['alt', 'else', 'end', 'note', 'loop'].includes(src.toLowerCase())) continue;
+
+    if (!nodesMap.has(src)) {
+      const isUser = /user|clinic|doctor|human/i.test(src);
+      nodesMap.set(src, { id: src, label: src, type: isUser ? 'user' : 'service' });
+    }
+    if (!nodesMap.has(tgt)) {
+      const isUser = /user|clinic|doctor|human/i.test(tgt);
+      nodesMap.set(tgt, { id: tgt, label: tgt, type: isUser ? 'user' : 'service' });
+    }
+
+    if (src === tgt) {
+      const existing = nodesMap.get(src);
+      if (existing && !existing.subtitle) {
+        existing.subtitle = text;
+      }
+      continue;
+    }
+
+    const existingEdge = edges.find((e) => e.source === src && e.target === tgt);
+    if (existingEdge) {
+      if (!existingEdge.label?.includes(text)) {
+        const parts = (existingEdge.label || '').split(' · ');
+        if (parts.length < 3) {
+          existingEdge.label = existingEdge.label ? `${existingEdge.label} · ${text}` : text;
+        } else if (!existingEdge.label?.endsWith('...')) {
+          existingEdge.label = `${existingEdge.label} · ...`;
+        }
+      }
+    } else {
+      edges.push({
+        id: `seq_e_${++edgeSeq}`,
+        source: src,
+        target: tgt,
+        label: text,
+        animated: arrow.includes('--'),
+      });
+    }
+  }
+
+  return {
+    id: `process-flow-${Date.now()}`,
+    name: 'Process Flow Diagram',
+    direction: 'RIGHT',
+    nodes: Array.from(nodesMap.values()),
+    edges,
+  };
+}
+
 export async function renderMermaidDiagrams(
   container: HTMLElement | null,
   diagrams?: string[]
@@ -208,14 +292,18 @@ export async function renderMermaidDiagrams(
     const isFlowchart =
       trimmed.startsWith('flowchart') ||
       trimmed.startsWith('graph');
+    const isSequence = trimmed.startsWith('sequenceDiagram');
+    const isInteractive = isFlowchart || isSequence;
 
     // ========================================================
-    // 1. INTERACTIVE REACT FLOW + ELK DIAGRAM FOR FLOWCHARTS
+    // 1. INTERACTIVE REACT FLOW + ELK DIAGRAM FOR ARCHITECTURE & PROCESS FLOWS
     // ========================================================
-    if (isFlowchart) {
+    if (isInteractive) {
       if (el.dataset.rendered === 'flow' && (el as any)._lastDiagCode === diagCode) continue;
       el.dataset.rendered = 'flow';
       (el as any)._lastDiagCode = diagCode;
+
+      const flowHeight = isSequence ? '500px' : '580px';
 
       // Re-style wrapper container so React Flow fills it cleanly
       el.classList.remove('loading');
@@ -227,7 +315,7 @@ export async function renderMermaidDiagrams(
       el.style.boxShadow = 'none';
       el.style.display = 'block';
       el.style.width = '100%';
-      el.style.minHeight = '580px';
+      el.style.minHeight = flowHeight;
       el.innerHTML = '';
 
       let root = (el as any)._reactRoot;
@@ -236,12 +324,15 @@ export async function renderMermaidDiagrams(
         (el as any)._reactRoot = root;
       }
 
-      // Parse each class's own diagram code dynamically!
-      const parsedGraph = parseMermaidFlowchart(diagCode);
+      // Parse diagram code dynamically (flowchart or sequence)
+      const parsedGraph = isSequence
+        ? parseMermaidSequence(diagCode)
+        : parseMermaidFlowchart(diagCode);
+
       root.render(
         createElement(ArchitectureFlow, {
           initialGraph: parsedGraph,
-          height: '580px',
+          height: flowHeight,
           showControls: true,
           showMinimap: true,
           showToolbar: false, // Never force the admin toolbar in lesson view
