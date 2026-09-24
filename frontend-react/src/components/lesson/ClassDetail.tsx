@@ -12,7 +12,7 @@ import { annotateHtmlForTts } from '../../utils/ttsAnnotator';
 import type { TtsSentence } from '../../utils/ttsAnnotator';
 import { LessonDetailSkeleton } from '../common/Skeleton';
 
-const API_BASE = 'http://127.0.0.1:8000/api';
+import { API_BASE } from '../../services/api';
 
 interface CodeFile {
   name: string;
@@ -47,7 +47,7 @@ const ESTIMATED_TIMES: Record<number, string> = {
 function parseToc(toc: string[]): TocItem[] {
   return toc.map((item, i) => ({
     text: item.replace(/^#+\s*/, ''),
-    id: `toc-${i}`,
+    id: `s${i}`,
   }));
 }
 
@@ -63,7 +63,75 @@ export function ClassDetail() {
   const [isCompleted, setIsCompleted] = useState(false);
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [showCompiler, setShowCompiler] = useState(false);
+  const [activeTocId, setActiveTocId] = useState<string>('');
   const articleRef = useRef<HTMLElement>(null);
+
+  const scrollToTarget = (e: React.MouseEvent, targetId: string, itemIndex?: number) => {
+    e.preventDefault();
+    let targetEl = document.getElementById(targetId);
+
+    // Fallback: If not found directly by ID, search inside articleRef
+    if (!targetEl && articleRef.current) {
+      if (typeof itemIndex === 'number') {
+        const headings = articleRef.current.querySelectorAll('h2');
+        if (headings[itemIndex]) {
+          targetEl = headings[itemIndex] as HTMLElement;
+        }
+      }
+      if (!targetEl && targetId === 'knowledge-check') {
+        targetEl = (document.getElementById('knowledge-check') ||
+          articleRef.current.querySelector('.quiz-section')) as HTMLElement;
+      }
+    }
+
+    if (targetEl) {
+      targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      setActiveTocId(targetId);
+      try {
+        window.history.replaceState(null, '', `#${targetId}`);
+      } catch (_) {}
+    }
+  };
+
+  // Track active section as the user scrolls
+  useEffect(() => {
+    if (!data || !articleRef.current) return;
+
+    const sections = articleRef.current.querySelectorAll('h2, #knowledge-check, #code-lab-section');
+    if (!sections.length) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && entry.target.id) {
+            setActiveTocId(entry.target.id);
+          }
+        });
+      },
+      {
+        rootMargin: '-80px 0px -70% 0px',
+        threshold: 0,
+      }
+    );
+
+    sections.forEach((s) => observer.observe(s));
+    return () => observer.disconnect();
+  }, [data]);
+
+  // Support direct URL hash linking on load
+  useEffect(() => {
+    if (data && window.location.hash) {
+      const hash = window.location.hash.replace('#', '');
+      const timer = setTimeout(() => {
+        const el = document.getElementById(hash);
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          setActiveTocId(hash);
+        }
+      }, 200);
+      return () => clearTimeout(timer);
+    }
+  }, [data]);
 
   // Exit fullscreen compiler on Escape
   useEffect(() => {
@@ -277,8 +345,13 @@ export function ClassDetail() {
           <aside className="lesson-toc" aria-label="Lesson contents">
             <div className="lesson-toc-title">On this page</div>
             <nav>
-              {tocItems.map((item) => (
-                <a key={item.id} href={`#${item.id}`} className="lesson-toc-item">
+              {tocItems.map((item, idx) => (
+                <a
+                  key={item.id}
+                  href={`#${item.id}`}
+                  className={`lesson-toc-item ${activeTocId === item.id ? 'lesson-toc-item--active active' : ''}`}
+                  onClick={(e) => scrollToTarget(e, item.id, idx)}
+                >
                   {item.text}
                 </a>
               ))}
@@ -288,7 +361,11 @@ export function ClassDetail() {
                 <CheckCircle size={14} /> Lesson complete
               </div>
             ) : (
-              <a href="#knowledge-check" className="lesson-toc-pending">
+              <a
+                href="#knowledge-check"
+                className={`lesson-toc-pending ${activeTocId === 'knowledge-check' ? 'active' : ''}`}
+                onClick={(e) => scrollToTarget(e, 'knowledge-check')}
+              >
                 Complete quiz to finish
               </a>
             )}
@@ -551,7 +628,11 @@ export function ClassDetail() {
                   <p className="lesson-footer-prompt-title">Complete the Knowledge Check above to finish this lesson</p>
                   <p className="lesson-footer-prompt-sub">Submit your attempt on the quiz above to automatically mark this class as completed.</p>
                 </div>
-                <a href="#knowledge-check" className="btn btn--primary">
+                <a
+                  href="#knowledge-check"
+                  className="btn btn--primary"
+                  onClick={(e) => scrollToTarget(e, 'knowledge-check')}
+                >
                   Go to Knowledge Check
                 </a>
               </div>

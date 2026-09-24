@@ -232,7 +232,7 @@ def _parse_markdown_doc(text: str) -> tuple[str, List[str], List[str]]:
         toc.append(clean_title)
         return f'<h2 id="s{idx}">{title}</h2>'
 
-    html = re.sub(r'<h2>(.*?)</h2>', add_h2_id, html)
+    html = re.sub(r'<h2(?:\s+[^>]*)?>(.*?)</h2>', add_h2_id, html, flags=re.IGNORECASE)
     return html, diagrams, toc
 
 def _read_code_files(folder_path: Path) -> List[CodeFile]:

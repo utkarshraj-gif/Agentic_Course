@@ -4,8 +4,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { Code, Copy, ChevronLeft, CheckCircle, Tag } from 'lucide-react';
 import { ProgressService } from '../../services/progress/ProgressService';
 import { renderMermaidDiagrams } from '../../utils/mermaidRenderer';
-
-const API_BASE = 'http://127.0.0.1:8000/api';
+import { API_BASE } from '../../services/api';
 
 interface CodeFile {
   name: string;
@@ -33,7 +32,69 @@ export function CapstoneDetail() {
   const [data, setData] = useState<CapstoneDetailData | null>(null);
   const [activeTab, setActiveTab] = useState(0);
   const [copied, setCopied] = useState(false);
+  const [activeTocId, setActiveTocId] = useState<string>('');
   const articleRef = useRef<HTMLElement>(null);
+
+  const scrollToTarget = (e: React.MouseEvent, targetId: string, itemIndex?: number) => {
+    e.preventDefault();
+    let targetEl = document.getElementById(targetId);
+
+    // Fallback: If not found by ID, search inside articleRef
+    if (!targetEl && articleRef.current && typeof itemIndex === 'number') {
+      const headings = articleRef.current.querySelectorAll('h2');
+      if (headings[itemIndex]) {
+        targetEl = headings[itemIndex] as HTMLElement;
+      }
+    }
+
+    if (targetEl) {
+      targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      setActiveTocId(targetId);
+      try {
+        window.history.replaceState(null, '', `#${targetId}`);
+      } catch (_) {}
+    }
+  };
+
+  // Track active section as the user scrolls
+  useEffect(() => {
+    if (!data || !articleRef.current) return;
+
+    const sections = articleRef.current.querySelectorAll('h2');
+    if (!sections.length) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && entry.target.id) {
+            setActiveTocId(entry.target.id);
+          }
+        });
+      },
+      {
+        rootMargin: '-80px 0px -70% 0px',
+        threshold: 0,
+      }
+    );
+
+    sections.forEach((s) => observer.observe(s));
+    return () => observer.disconnect();
+  }, [data]);
+
+  // Support direct URL hash linking on load
+  useEffect(() => {
+    if (data && window.location.hash) {
+      const hash = window.location.hash.replace('#', '');
+      const timer = setTimeout(() => {
+        const el = document.getElementById(hash);
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          setActiveTocId(hash);
+        }
+      }, 200);
+      return () => clearTimeout(timer);
+    }
+  }, [data]);
 
   useEffect(() => {
     setData(null);
@@ -109,7 +170,12 @@ export function CapstoneDetail() {
             <div className="lesson-toc-title">On this page</div>
             <nav>
               {data.toc.map((item, i) => (
-                <a key={i} href={`#section-${i}`} className="lesson-toc-item">
+                <a
+                  key={i}
+                  href={`#s${i}`}
+                  className={`lesson-toc-item ${activeTocId === `s${i}` ? 'lesson-toc-item--active active' : ''}`}
+                  onClick={(e) => scrollToTarget(e, `s${i}`, i)}
+                >
                   {item.replace(/^#+\s*/, '')}
                 </a>
               ))}

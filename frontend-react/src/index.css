@@ -2305,15 +2305,36 @@ img {
   display: block;
   padding: 0.35rem 0;
   color: var(--text-muted);
-  transition: color var(--transition);
+  transition: all var(--transition);
   border-left: 2px solid transparent;
   padding-left: 10px;
   margin-left: -2px;
+  text-decoration: none;
+  cursor: pointer;
+  border-radius: 0 4px 4px 0;
 }
 
 .lesson-toc-item:hover {
   color: var(--primary);
   border-left-color: var(--primary);
+  background: rgba(20, 184, 166, 0.04);
+}
+
+.lesson-toc-item.active,
+.lesson-toc-item--active {
+  color: var(--primary);
+  border-left-color: var(--primary);
+  font-weight: 600;
+  background: rgba(20, 184, 166, 0.08);
+}
+
+.lesson-content h2,
+.lesson-content h3,
+.prose h2,
+.prose h3,
+#knowledge-check,
+#code-lab-section {
+  scroll-margin-top: 85px;
 }
 
 .lesson-toc-done {
