@@ -2,7 +2,7 @@
 import { Link, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard, BookOpen, Layers, FlaskConical, Map, Search,
-  CheckCircle, LogOut, User, Lock, PanelLeftClose, PanelLeftOpen, X
+  CheckCircle, LogOut, User, Lock
 } from 'lucide-react';
 import { useAuth } from '../../services/auth/AuthContext';
 import { ProgressService } from '../../services/progress/ProgressService';
@@ -17,8 +17,6 @@ interface SidebarProps {
   refreshKey: number;
   mobileOpen?: boolean;
   onMobileClose?: () => void;
-  isCollapsed?: boolean;
-  onToggleCollapse?: () => void;
 }
 
 const NAV_ITEMS = [
@@ -30,14 +28,7 @@ const NAV_ITEMS = [
   { to: '/search', label: 'Search', icon: Search },
 ];
 
-export function Sidebar({ 
-  classes, 
-  refreshKey, 
-  mobileOpen, 
-  onMobileClose,
-  isCollapsed = false,
-  onToggleCollapse
-}: SidebarProps) {
+export function Sidebar({ classes, refreshKey, mobileOpen, onMobileClose }: SidebarProps) {
   const location = useLocation();
   const { user, logout } = useAuth();
   const classList = Object.values(classes).sort((a, b) => a.id - b.id);
@@ -60,49 +51,15 @@ export function Sidebar({
   };
 
   return (
-    <aside 
-      className={`sidebar ${mobileOpen ? 'sidebar--open' : ''} ${isCollapsed ? 'sidebar--collapsed' : ''}`} 
-      role="navigation" 
-      aria-label="Main navigation"
-    >
-      {/* Brand Header with Collapse and Mobile Close Actions */}
-      <div className="sidebar-header-row">
-        <Link to="/" className="sidebar-brand" title="Back to Landing Page" onClick={onMobileClose}>
-          <img src="/logo.png" alt="Velloe Logo" className="sidebar-brand-img" />
-          {!isCollapsed && (
-            <div className="sidebar-brand-text">
-              <span className="sidebar-brand-name">VELLOE</span>
-              <span className="sidebar-brand-sub">Agentic AI Academy</span>
-            </div>
-          )}
-        </Link>
-
-        {/* Desktop Collapse Toggle */}
-        {onToggleCollapse && (
-          <button
-            type="button"
-            className="sidebar-collapse-btn"
-            onClick={onToggleCollapse}
-            title={isCollapsed ? 'Expand Sidebar (Ctrl+B)' : 'Collapse Sidebar (Ctrl+B)'}
-            aria-label="Toggle sidebar panel"
-          >
-            {isCollapsed ? <PanelLeftOpen size={16} /> : <PanelLeftClose size={16} />}
-          </button>
-        )}
-
-        {/* Mobile Close Button */}
-        {onMobileClose && (
-          <button
-            type="button"
-            className="sidebar-mobile-close-btn"
-            onClick={onMobileClose}
-            title="Close menu"
-            aria-label="Close menu"
-          >
-            <X size={18} />
-          </button>
-        )}
-      </div>
+    <aside className={`sidebar ${mobileOpen ? 'sidebar--open' : ''}`} role="navigation" aria-label="Main navigation">
+      {/* Brand - Links back to Landing Page */}
+      <Link to="/" className="sidebar-brand" title="Back to Landing Page" onClick={onMobileClose}>
+        <img src="/logo.png" alt="Velloe Logo" className="sidebar-brand-img" />
+        <div className="sidebar-brand-text">
+          <span className="sidebar-brand-name">VELLOE</span>
+          <span className="sidebar-brand-sub">Agentic AI Academy</span>
+        </div>
+      </Link>
 
       {/* Primary Nav */}
       <nav className="sidebar-nav">

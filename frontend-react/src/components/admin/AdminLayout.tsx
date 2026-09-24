@@ -10,9 +10,7 @@ import {
   LayoutDashboard,
   Shield,
   Menu,
-  X,
-  PanelLeftClose,
-  PanelLeftOpen
+  X
 } from 'lucide-react';
 import { useAdminAuth } from '../../services/admin/AdminAuthContext';
 
@@ -21,41 +19,11 @@ export function AdminLayout() {
   const navigate = useNavigate();
   const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [isCollapsed, setIsCollapsed] = useState(() => {
-    return localStorage.getItem('velloe_admin_sidebar_collapsed') === 'true';
-  });
 
   // Close mobile drawer on route change
   useEffect(() => {
     setMobileOpen(false);
   }, [location.pathname]);
-
-  // Global shortcut Ctrl+B / Cmd+B to toggle collapse
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'b') {
-        e.preventDefault();
-        setIsCollapsed(c => {
-          const next = !c;
-          localStorage.setItem('velloe_admin_sidebar_collapsed', String(next));
-          return next;
-        });
-      }
-      if (e.key === 'Escape') {
-        setMobileOpen(false);
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
-
-  const handleToggleCollapse = () => {
-    setIsCollapsed(c => {
-      const next = !c;
-      localStorage.setItem('velloe_admin_sidebar_collapsed', String(next));
-      return next;
-    });
-  };
 
   const handleLogout = () => {
     adminLogout();
@@ -63,7 +31,7 @@ export function AdminLayout() {
   };
 
   return (
-    <div className={`app-shell ${isCollapsed ? 'app-shell--sidebar-collapsed' : ''}`}>
+    <div className="app-shell">
       {/* Mobile overlay */}
       {mobileOpen && (
         <div
@@ -82,61 +50,20 @@ export function AdminLayout() {
         {mobileOpen ? <X size={20} /> : <Menu size={20} />}
       </button>
 
-      {/* Floating desktop expand button when sidebar is collapsed */}
-      {isCollapsed && (
-        <button
-          className="sidebar-desktop-expand-btn"
-          onClick={handleToggleCollapse}
-          title="Expand Sidebar (Ctrl+B)"
-          aria-label="Expand Sidebar"
-        >
-          <PanelLeftOpen size={15} />
-          <span>Expand</span>
-        </button>
-      )}
-
       {/* Sidebar matching Learner navigation layout */}
       <aside 
-        className={`sidebar ${mobileOpen ? 'sidebar--open' : ''} ${isCollapsed ? 'sidebar--collapsed' : ''}`} 
+        className={`sidebar ${mobileOpen ? 'sidebar--open' : ''}`} 
         role="navigation" 
         aria-label="Admin navigation"
       >
-        {/* Brand Header Row with Collapse and Close buttons */}
-        <div className="sidebar-header-row">
-          <Link to="/admin/dashboard" className="sidebar-brand" title="Enterprise Administration" onClick={() => setMobileOpen(false)}>
-            <img src="/logo.png" alt="Velloe Logo" className="sidebar-brand-img" />
-            {!isCollapsed && (
-              <div className="sidebar-brand-text">
-                <span className="sidebar-brand-name">VELLOE</span>
-                <span className="sidebar-brand-sub">Enterprise Admin</span>
-              </div>
-            )}
-          </Link>
-
-          {/* Desktop Collapse Toggle */}
-          <button
-            type="button"
-            className="sidebar-collapse-btn"
-            onClick={handleToggleCollapse}
-            title={isCollapsed ? 'Expand Sidebar (Ctrl+B)' : 'Collapse Sidebar (Ctrl+B)'}
-            aria-label="Toggle sidebar panel"
-          >
-            {isCollapsed ? <PanelLeftOpen size={16} /> : <PanelLeftClose size={16} />}
-          </button>
-
-          {/* Mobile Close Button */}
-          {mobileOpen && (
-            <button
-              type="button"
-              className="sidebar-mobile-close-btn"
-              onClick={() => setMobileOpen(false)}
-              title="Close menu"
-              aria-label="Close menu"
-            >
-              <X size={18} />
-            </button>
-          )}
-        </div>
+        {/* Brand */}
+        <Link to="/admin/dashboard" className="sidebar-brand" title="Enterprise Administration" onClick={() => setMobileOpen(false)}>
+          <img src="/logo.png" alt="Velloe Logo" className="sidebar-brand-img" />
+          <div className="sidebar-brand-text">
+            <span className="sidebar-brand-name">VELLOE</span>
+            <span className="sidebar-brand-sub">Enterprise Admin</span>
+          </div>
+        </Link>
 
         {/* Primary Admin Nav */}
         <nav className="sidebar-nav">
