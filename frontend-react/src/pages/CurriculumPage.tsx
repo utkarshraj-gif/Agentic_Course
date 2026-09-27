@@ -166,7 +166,7 @@ function WeekAccordion({
                         <Lock size={13} />
                       </div>
                       <div>
-                        <div className="class-row-num">{classId === 0 ? 'Class 00 · Prerequisites' : `Class ${String(classId).padStart(2, '0')}`}</div>
+                        <div className="class-row-num">{classId === 0 ? 'Prerequisites' : `Class ${String(classId).padStart(2, '0')}`}</div>
                         <div className="class-row-title">{cls.short}</div>
                         {cls.description && <div className="class-row-desc">{cls.description}</div>}
                       </div>
@@ -188,7 +188,7 @@ function WeekAccordion({
                       {done ? <CheckCircle size={14} /> : <Circle size={14} />}
                     </div>
                     <div>
-                      <div className="class-row-num">{classId === 0 ? 'Class 00 · Prerequisites' : `Class ${String(classId).padStart(2, '0')}`}</div>
+                      <div className="class-row-num">{classId === 0 ? 'Prerequisites' : `Class ${String(classId).padStart(2, '0')}`}</div>
                       <div className="class-row-title">{cls.short}</div>
                       {cls.description && <div className="class-row-desc">{cls.description}</div>}
                     </div>

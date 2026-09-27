@@ -56,7 +56,9 @@ function PageTitleManager() {
       title = 'Enterprise AI Agent Course | Velloe Learns';
     } else if (path.startsWith('/class/')) {
       const id = path.split('/')[2];
-      title = `Class ${id} | Velloe Learns`;
+      title = id === '0'
+        ? 'Prerequisites & Environment Setup | Velloe Learns'
+        : `Class ${id} | Velloe Learns`;
     } else if (path === '/practice') {
       title = 'Practice & Labs | Velloe Learns';
     } else if (path === '/projects') {

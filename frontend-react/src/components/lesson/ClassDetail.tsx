@@ -187,7 +187,9 @@ export function ClassDetail() {
         d.html = annotatedHtml;
         setTtsSentences(sentences);
         setData(d);
-        document.title = `Class ${classId}: ${d.short || d.title} | Velloe Learns`;
+        document.title = classId === 0
+          ? `${d.short || 'Prerequisites & Environment Setup'} | Velloe Learns`
+          : `Class ${classId}: ${d.short || d.title} | Velloe Learns`;
         const completed = ProgressService.isClassCompleted(classId);
         setIsCompleted(completed);
         setIsBookmarked(BookmarkService.isBookmarked(classId));
@@ -317,7 +319,7 @@ export function ClassDetail() {
           <Link to="/curriculum">Courses</Link>
           <span aria-hidden="true">/</span>
           <span aria-current="page">
-            {classId === 0 ? 'Class 00 · Prerequisites' : `Class ${String(classId).padStart(2, '0')}`}
+            {classId === 0 ? 'Prerequisites' : `Class ${String(classId).padStart(2, '0')}`}
           </span>
         </nav>
         <div className="lesson-controls">
@@ -344,7 +346,7 @@ export function ClassDetail() {
         <div className="lesson-header-inner">
           <div className="lesson-header-meta">
             <span className="lesson-tag">
-              <Tag size={12} /> {data.week === 0 ? 'Prerequisites (Week 0)' : `Week ${data.week}`}
+              <Tag size={12} /> {data.week === 0 ? 'Prerequisites' : `Week ${data.week}`}
             </span>
             <span className="lesson-tag"><Clock size={12} /> {ESTIMATED_TIMES[classId] ?? '45 min'}</span>
             {isCompleted && (
@@ -353,7 +355,7 @@ export function ClassDetail() {
               </span>
             )}
           </div>
-          <h1 className="lesson-title">{data.title}</h1>
+          <h1 className="lesson-title">{classId === 0 ? 'Prerequisites & Environment Setup' : data.title}</h1>
           <div className="lesson-meta-breakdown">
             {data.meta?.domain && (
               <div className="lesson-meta-row">
@@ -439,8 +441,8 @@ export function ClassDetail() {
               }}
             >
               <LabCompiler
-                labId={classId <= 8 ? `lab-0${classId}` : `class-${classId}`}
-                labTitle={`Class ${classId} Lab: ${data.short || data.title}`}
+                labId={classId === 0 ? 'prerequisites' : (classId <= 8 ? `lab-0${classId}` : `class-${classId}`)}
+                labTitle={classId === 0 ? `Prerequisites Lab: ${data.short || data.title}` : `Class ${classId} Lab: ${data.short || data.title}`}
               />
             </div>
           )}
@@ -648,8 +650,8 @@ export function ClassDetail() {
                   >
                     <LabCompiler
                       key={`${classId}-${data.files[activeTab]?.name || activeTab}`}
-                      labId={classId <= 8 ? `lab-0${classId}` : `class-${classId}`}
-                      labTitle={`Class ${classId} Lab: ${data.short || data.title}`}
+                      labId={classId === 0 ? 'prerequisites' : (classId <= 8 ? `lab-0${classId}` : `class-${classId}`)}
+                      labTitle={classId === 0 ? `Prerequisites Lab: ${data.short || data.title}` : `Class ${classId} Lab: ${data.short || data.title}`}
                       defaultFilename={data.files[activeTab]?.name || 'main.py'}
                       defaultCode={data.files[activeTab]?.code}
                     />
@@ -692,7 +694,11 @@ export function ClassDetail() {
                   <strong>Lesson completed</strong>
                   <p>Knowledge Check submitted · Your progress has been saved.</p>
                 </div>
-                {classId < 15 ? (
+                {classId === 0 ? (
+                  <Link to="/class/1" className="btn btn--primary">
+                    Start Class 01: Introduction to Agentic AI <ChevronLeft size={14} style={{ transform: 'rotate(180deg)' }} />
+                  </Link>
+                ) : classId < 15 ? (
                   <Link to={`/class/${classId + 1}`} className="btn btn--primary">
                     Next class ({classId + 1}) <ChevronLeft size={14} style={{ transform: 'rotate(180deg)' }} />
                   </Link>

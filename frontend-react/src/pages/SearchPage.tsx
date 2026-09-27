@@ -79,8 +79,8 @@ function runUnifiedSearch(classes: ClassModule[], query: string): SearchResult[]
       results.push({
         type: 'class',
         id: `class-${cls.id}`,
-        title: `Class ${cls.id}: ${cls.short}`,
-        subtitle: `Week ${cls.week} · ${cls.description?.slice(0, 95) ?? ''}...`,
+        title: cls.id === 0 ? cls.short : `Class ${cls.id}: ${cls.short}`,
+        subtitle: cls.week === 0 ? `Prerequisites · ${cls.description?.slice(0, 95) ?? ''}...` : `Week ${cls.week} · ${cls.description?.slice(0, 95) ?? ''}...`,
         path: `/class/${cls.id}`,
         matchedOn,
       });

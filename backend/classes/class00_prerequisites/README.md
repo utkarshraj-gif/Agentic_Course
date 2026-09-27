@@ -1,6 +1,6 @@
-# Class 0 — Prerequisites & Environment Setup
+# Prerequisites & Environment Setup
 
-**Week 0 · Prerequisites**
+**Prerequisites**
 
 * **Domain Example:** Enterprise Workstation & Infrastructure Provisioning
 * **Tools & Frameworks:** Python 3.10+, Virtualenv, LangGraph, FAISS, Chroma DB, Docker, Redis, Model Context Protocol (MCP)

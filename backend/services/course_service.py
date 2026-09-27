@@ -293,7 +293,7 @@ class CourseService:
             w_num = next((w["n"] for w in WEEKS_CONFIG if num in w["classes"]), 1)
             classes_summary[str(num)] = {
                 "id": num,
-                "title": f"Class {num} — {meta.get('short', '')}",
+                "title": meta.get("short", "Prerequisites & Environment Setup") if num == 0 else f"Class {num} — {meta.get('short', '')}",
                 "short": meta.get("short", f"Class {num}"),
                 "domain": meta.get("domain", ""),
                 "tools": meta.get("tools", []),
@@ -369,10 +369,10 @@ class CourseService:
 
         return ClassDetail(
             id=class_num,
-            title=f"Class {class_num} — {meta.get('short', '')}",
+            title=meta.get("short", "Prerequisites & Environment Setup") if class_num == 0 else f"Class {class_num} — {meta.get('short', '')}",
             short=meta.get("short", f"Class {class_num}"),
             week=w_num,
-            meta={"week": f"Week {w_num} · {w_title}", "tools": meta.get("tools", []), "domain": meta.get("domain", "")},
+            meta={"week": "Prerequisites" if w_num == 0 else f"Week {w_num} · {w_title}", "tools": meta.get("tools", []), "domain": meta.get("domain", "")},
             html=html,
             diagrams=diagrams,
             toc=toc,

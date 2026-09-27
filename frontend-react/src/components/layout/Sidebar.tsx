@@ -105,7 +105,7 @@ export function Sidebar({ classes, refreshKey, mobileOpen, onMobileClose }: Side
                   to={`/class/${cls.id}`}
                   className={`stepper-item ${isCurrent ? 'stepper-item--current' : ''} ${done ? 'stepper-item--done' : ''} ${isLocked ? 'stepper-item--locked' : ''} ${isNext ? 'stepper-item--next' : ''}`}
                   onClick={onMobileClose}
-                  title={`Class ${cls.id}: ${cls.short} ${isLocked ? '(Locked)' : `(${CLASS_DURATIONS[cls.id] || '45m'})`}`}
+                  title={cls.id === 0 ? `${cls.short} ${isLocked ? '(Locked)' : '(30m)'}` : `Class ${cls.id}: ${cls.short} ${isLocked ? '(Locked)' : `(${CLASS_DURATIONS[cls.id] || '45m'})`}`}
                 >
                   {/* Timeline node */}
                   <div className="stepper-node">
@@ -116,7 +116,7 @@ export function Sidebar({ classes, refreshKey, mobileOpen, onMobileClose }: Side
                     ) : isNext ? (
                       <span className="stepper-dot--next" />
                     ) : (
-                      <span className="stepper-num">{String(cls.id).padStart(2, '0')}</span>
+                      <span className="stepper-num">{cls.id === 0 ? 'P' : String(cls.id).padStart(2, '0')}</span>
                     )}
                   </div>
 
