@@ -2,11 +2,12 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
-  LayoutDashboard, BookOpen, Layers, FlaskConical, Map, Search,
+  LayoutDashboard, BookOpen, Layers, FlaskConical,
   CheckCircle, LogOut, User, Lock
 } from 'lucide-react';
 import { useAuth } from '../../services/auth/AuthContext';
 import { ProgressService } from '../../services/progress/ProgressService';
+import { getPrimaryCapstoneForClass } from '../../data';
 
 interface ClassInfo {
   id: number;
@@ -20,13 +21,9 @@ interface SidebarProps {
   onMobileClose?: () => void;
 }
 
-const NAV_ITEMS = [
+const BASE_NAV_ITEMS = [
   { to: '/dashboard', label: 'Overview', icon: LayoutDashboard },
   { to: '/curriculum', label: 'Courses', icon: BookOpen },
-  { to: '/practice', label: 'Practice', icon: FlaskConical },
-  { to: '/projects', label: 'Projects', icon: Layers },
-  { to: '/skills', label: 'Skill Map', icon: Map },
-  { to: '/search', label: 'Search', icon: Search },
 ];
 
 export function Sidebar({ classes, refreshKey, mobileOpen, onMobileClose }: SidebarProps) {
@@ -34,16 +31,38 @@ export function Sidebar({ classes, refreshKey, mobileOpen, onMobileClose }: Side
   const { user, logout } = useAuth();
   const classList = Object.values(classes).sort((a, b) => a.id - b.id);
 
+  // Content context: show practice and projects only while in course curriculum, classes, or labs/projects
   const isCoursesOpen = location.pathname.startsWith('/curriculum/') || location.pathname.startsWith('/class/');
-  const isOnCurriculumRoot = location.pathname === '/curriculum';
+  const isPracticeOrProjects = location.pathname.startsWith('/practice') || location.pathname.startsWith('/projects') || location.pathname.startsWith('/capstones/');
+  const isContentContext = isCoursesOpen || isPracticeOrProjects;
 
-  const isCoursesActive = isCoursesOpen || isOnCurriculumRoot;
-  void isOnCurriculumRoot;
+  // Extract active class ID if currently on /class/:id
+  const classMatch = location.pathname.match(/\/class\/(\d+)/);
+  const currentClassId = classMatch ? parseInt(classMatch[1], 10) : null;
+  const currentClassCapstone = currentClassId !== null ? getPrimaryCapstoneForClass(currentClassId) : null;
+
+  const navItems = isContentContext
+    ? [
+        { to: '/dashboard', label: 'Overview', icon: LayoutDashboard },
+        { to: '/curriculum', label: 'Courses', icon: BookOpen },
+        {
+          to: currentClassId !== null ? `/practice?class=${currentClassId}` : '/practice',
+          label: 'Practice',
+          icon: FlaskConical,
+        },
+        {
+          to: currentClassCapstone ? `/capstones/${currentClassCapstone.slug}` : (currentClassId !== null ? `/projects?class=${currentClassId}` : '/projects'),
+          label: 'Projects',
+          icon: Layers,
+        },
+      ]
+    : BASE_NAV_ITEMS;
 
   const isActive = (to: string) => {
     if (to === '/dashboard') return location.pathname === '/dashboard' || location.pathname === '/overview';
-    if (to === '/curriculum') return isCoursesActive;
-    return location.pathname.startsWith(to);
+    if (to === '/curriculum') return location.pathname === '/curriculum' || isCoursesOpen;
+    const basePath = to.split('?')[0];
+    return location.pathname.startsWith(basePath);
   };
 
   const [tick, setTick] = useState(0);
@@ -78,12 +97,12 @@ export function Sidebar({ classes, refreshKey, mobileOpen, onMobileClose }: Side
         </div>
       </Link>
 
-      {/* Primary Nav */}
+      {/* Primary Nav — Only Overview and Courses on root overview/catalog, adds Practice & Projects when inside related content */}
       <nav className="sidebar-nav">
         <div className="sidebar-section-label">Navigation</div>
-        {NAV_ITEMS.map(({ to, label, icon: Icon }) => (
+        {navItems.map(({ to, label, icon: Icon }) => (
           <Link
-            key={to}
+            key={label}
             to={to}
             className={`sidebar-nav-item ${isActive(to) ? 'sidebar-nav-item--active' : ''}`}
             onClick={onMobileClose}
@@ -108,36 +127,64 @@ export function Sidebar({ classes, refreshKey, mobileOpen, onMobileClose }: Side
               const isLocked = !ProgressService.isClassUnlocked(cls.id);
               const isCurrent = location.pathname === `/class/${cls.id}`;
               const isNext = !done && !isLocked && cls.id === upNextId;
+              const primaryCap = getPrimaryCapstoneForClass(cls.id);
 
               return (
-                <Link
-                  key={cls.id}
-                  to={`/class/${cls.id}`}
-                  className={`stepper-item ${isCurrent ? 'stepper-item--current' : ''} ${done ? 'stepper-item--done' : ''} ${isLocked ? 'stepper-item--locked' : ''} ${isNext ? 'stepper-item--next' : ''}`}
-                  onClick={onMobileClose}
-                  title={cls.id === 0 ? `${cls.short} ${isLocked ? '(Locked)' : '(30m)'}` : `Class ${cls.id}: ${cls.short} ${isLocked ? '(Locked)' : `(${CLASS_DURATIONS[cls.id] || '45m'})`}`}
-                >
-                  {/* Timeline node */}
-                  <div className="stepper-node">
-                    {done ? (
-                      <CheckCircle size={11} className="stepper-icon--done" />
-                    ) : isLocked ? (
-                      <Lock size={9} className="stepper-icon--locked" />
-                    ) : isNext ? (
-                      <span className="stepper-dot--next" />
-                    ) : (
-                      <span className="stepper-num">{cls.id === 0 ? 'P' : String(cls.id).padStart(2, '0')}</span>
-                    )}
-                  </div>
+                <div key={cls.id} className="stepper-item-group">
+                  <Link
+                    to={`/class/${cls.id}`}
+                    className={`stepper-item ${isCurrent ? 'stepper-item--current' : ''} ${done ? 'stepper-item--done' : ''} ${isLocked ? 'stepper-item--locked' : ''} ${isNext ? 'stepper-item--next' : ''}`}
+                    onClick={onMobileClose}
+                    title={cls.id === 0 ? `${cls.short} ${isLocked ? '(Locked)' : '(30m)'}` : `Class ${cls.id}: ${cls.short} ${isLocked ? '(Locked)' : `(${CLASS_DURATIONS[cls.id] || '45m'})`}`}
+                  >
+                    {/* Timeline node */}
+                    <div className="stepper-node">
+                      {done ? (
+                        <CheckCircle size={11} className="stepper-icon--done" />
+                      ) : isLocked ? (
+                        <Lock size={9} className="stepper-icon--locked" />
+                      ) : isNext ? (
+                        <span className="stepper-dot--next" />
+                      ) : (
+                        <span className="stepper-num">{cls.id === 0 ? 'P' : String(cls.id).padStart(2, '0')}</span>
+                      )}
+                    </div>
 
-                  {/* Title */}
-                  <span className="stepper-title">{cls.short}</span>
+                    {/* Title */}
+                    <span className="stepper-title">{cls.short}</span>
 
-                  {/* Right Status Indicator */}
-                  {isLocked && <span className="stepper-pill--locked"><Lock size={8} /> LOCKED</span>}
-                  {!isLocked && isNext && <span className="stepper-pill--next">UP NEXT</span>}
-                  {!isLocked && !done && !isNext && <span className="stepper-dur">{CLASS_DURATIONS[cls.id] || '45m'}</span>}
-                </Link>
+                    {/* Right Status Indicator */}
+                    {isLocked && <span className="stepper-pill--locked"><Lock size={8} /> LOCKED</span>}
+                    {!isLocked && isNext && <span className="stepper-pill--next">UP NEXT</span>}
+                    {!isLocked && !done && !isNext && <span className="stepper-dur">{CLASS_DURATIONS[cls.id] || '45m'}</span>}
+                  </Link>
+
+                  {/* Contextual Practice & Project sub-links when this class is open */}
+                  {isCurrent && (
+                    <div className="stepper-sub-links">
+                      <Link
+                        to={`/practice?class=${cls.id}`}
+                        className="stepper-sub-link"
+                        onClick={onMobileClose}
+                        title={`Open practice lab for ${cls.short}`}
+                      >
+                        <FlaskConical size={11} color="var(--primary)" />
+                        <span>Practice Lab</span>
+                      </Link>
+                      {primaryCap && (
+                        <Link
+                          to={`/capstones/${primaryCap.slug}`}
+                          className="stepper-sub-link"
+                          onClick={onMobileClose}
+                          title={`Open Capstone: ${primaryCap.title}`}
+                        >
+                          <Layers size={11} color={primaryCap.color} />
+                          <span>{primaryCap.short}</span>
+                        </Link>
+                      )}
+                    </div>
+                  )}
+                </div>
               );
             })}
           </div>

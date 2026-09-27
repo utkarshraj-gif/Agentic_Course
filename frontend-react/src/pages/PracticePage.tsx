@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
 import { FlaskConical, CheckCircle, Clock, ArrowRight, Code2, Terminal, ChevronDown, ChevronUp } from 'lucide-react';
 import { LabCompiler } from '../components/compiler/LabCompiler';
 
@@ -101,6 +101,23 @@ export function PracticePage() {
   const [filter, setFilter] = useState<'all' | 'not-started' | 'done'>('all');
   const [openCompilerId, setOpenCompilerId] = useState<string | null>(null);
   const [showScratchpad, setShowScratchpad] = useState<boolean>(false);
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const classParam = searchParams.get('class');
+  const targetClassId = classParam !== null ? parseInt(classParam, 10) : null;
+
+  useEffect(() => {
+    if (targetClassId !== null) {
+      const match = LABS.find(l => l.classId === targetClassId);
+      if (match) {
+        setOpenCompilerId(match.id);
+        setTimeout(() => {
+          const el = document.getElementById(match.id);
+          if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 150);
+      }
+    }
+  }, [targetClassId]);
 
   // Track lab completions in localStorage
   const isLabDone = (id: string) => localStorage.getItem(`velloe_progress_lab_${id}`) === 'true';
@@ -115,6 +132,7 @@ export function PracticePage() {
   };
 
   const filtered = LABS.filter(lab => {
+    if (targetClassId !== null && lab.classId !== targetClassId) return false;
     if (filter === 'done') return isLabDone(lab.id);
     if (filter === 'not-started') return !isLabDone(lab.id);
     return true;
@@ -124,6 +142,17 @@ export function PracticePage() {
 
   return (
     <div className="page">
+      {targetClassId !== null && (
+        <div className="practice-class-filter-banner">
+          <span>
+            Showing Hands-on Lab for <strong>{targetClassId === 0 ? 'Prerequisites' : `Class ${targetClassId}`}</strong>
+          </span>
+          <button className="btn btn--sm btn--outline" onClick={() => setSearchParams({})}>
+            View All {LABS.length} Labs
+          </button>
+        </div>
+      )}
+
       <div className="page-header" style={{ alignItems: 'flex-start' }}>
         <div>
           <h1 className="page-title">Practice Labs & Interactive Compiler</h1>
@@ -195,7 +224,7 @@ export function PracticePage() {
           const isCompilerOpen = openCompilerId === lab.id;
 
           return (
-            <div key={lab.id} className={`lab-card ${done ? 'lab-card--done' : ''}`}>
+            <div key={lab.id} id={lab.id} className={`lab-card ${done ? 'lab-card--done' : ''}`}>
               <div className="lab-card-header">
                 <div className="lab-icon">
                   {done ? <CheckCircle size={18} color="#10B981" /> : <FlaskConical size={18} />}

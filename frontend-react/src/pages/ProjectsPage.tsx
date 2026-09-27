@@ -1,9 +1,9 @@
-// pages/ProjectsPage.tsx
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { ArrowRight, CheckCircle, Stethoscope, Scale, Server, Package } from 'lucide-react';
 import { ProgressService } from '../services/progress/ProgressService';
 import { API_BASE } from '../services/api';
+import { getCapstonesForClass } from '../data';
 
 
 interface CapstoneInfo {
@@ -36,6 +36,11 @@ export function ProjectsPage() {
   const [capstones, setCapstones] = useState<CapstoneInfo[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const classParam = searchParams.get('class');
+  const targetClassId = classParam !== null ? parseInt(classParam, 10) : null;
+  const relatedSlugs = targetClassId !== null ? getCapstonesForClass(targetClassId).map(c => c.slug) : [];
 
   useEffect(() => {
     fetch(`${API_BASE}/capstones`)
@@ -55,6 +60,16 @@ export function ProjectsPage() {
 
   void refreshKey;
 
+  const displayedCapstones = targetClassId !== null && relatedSlugs.length > 0
+    ? [...capstones].sort((a, b) => {
+        const aRel = relatedSlugs.includes(a.slug);
+        const bRel = relatedSlugs.includes(b.slug);
+        if (aRel && !bRel) return -1;
+        if (!aRel && bRel) return 1;
+        return 0;
+      })
+    : capstones;
+
   return (
     <div className="page">
       <div className="page-header">
@@ -64,10 +79,21 @@ export function ProjectsPage() {
         </div>
       </div>
 
+      {targetClassId !== null && relatedSlugs.length > 0 && (
+        <div className="practice-class-filter-banner">
+          <span>
+            Highlighting Capstones for <strong>{targetClassId === 0 ? 'Prerequisites' : `Class ${targetClassId}`}</strong>
+          </span>
+          <button className="btn btn--sm btn--outline" onClick={() => setSearchParams({})}>
+            View All Projects
+          </button>
+        </div>
+      )}
+
       {loading && <div className="loading-state">Loading projects...</div>}
 
       <div className="projects-grid">
-        {capstones.map(cap => {
+        {displayedCapstones.map(cap => {
           const started = ProgressService.isProjectStarted(cap.slug);
           const skills = SKILLS_MAP[cap.slug] ?? [];
           const DomainIcon = DOMAIN_ICONS[cap.domain] ?? Package;
