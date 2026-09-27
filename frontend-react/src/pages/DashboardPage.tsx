@@ -95,7 +95,7 @@ export function DashboardPage() {
               <div className="resume-block">
                 <div className="resume-meta">
                   <span className="resume-course-badge">{activeCourse.shortTitle}</span>
-                  <span className="resume-tag">Class {lastVisited.classId}</span>
+                  <span className="resume-tag">{lastVisited.classId === 0 ? 'Prerequisites' : `Class ${lastVisited.classId}`}</span>
                 </div>
                 <h3 className="resume-title">{lastVisited.classTitle}</h3>
                 <div className="resume-progress-row">
@@ -120,8 +120,8 @@ export function DashboardPage() {
                 </div>
                 <h3 className="resume-title">Start your learning journey</h3>
                 <p>Begin with the foundation of {activeCourse.title} — and build from there.</p>
-                <Link to="/class/1" className="btn btn--primary">
-                  Start Class 1 <ArrowRight size={14} />
+                <Link to="/class/0" className="btn btn--primary">
+                  Start Prerequisites <ArrowRight size={14} />
                 </Link>
               </div>
             )}
@@ -147,7 +147,7 @@ export function DashboardPage() {
                 return (
                   <div key={week.n} className={`path-step ${isDone ? 'path-step--done' : isLocked ? 'path-step--locked' : isActive ? 'path-step--active' : ''}`}>
                     <div className="path-step-indicator">
-                      {isDone ? <CheckCircle size={14} /> : isLocked ? <Lock size={12} /> : <span>{String(week.n).padStart(2, '0')}</span>}
+                      {isDone ? <CheckCircle size={14} /> : isLocked ? <Lock size={12} /> : <span>{week.n === 0 ? 'PRE' : String(week.n).padStart(2, '0')}</span>}
                     </div>
                     <div className="path-step-content">
                       <div className="path-step-title-row">

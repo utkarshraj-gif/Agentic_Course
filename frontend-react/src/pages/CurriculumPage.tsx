@@ -1,9 +1,9 @@
 // pages/CurriculumPage.tsx
 import { useState, useEffect, useCallback } from 'react';
 import { Link, useOutletContext, useNavigate, useParams, useLocation } from 'react-router-dom';
-import { ChevronDown, ChevronRight, CheckCircle, Circle, Minus, Clock, ArrowRight, Lock } from 'lucide-react';
+import { ChevronDown, ChevronRight, CheckCircle, Circle, Minus, Clock, ArrowRight, Lock, Layers } from 'lucide-react';
 import { ProgressService } from '../services/progress/ProgressService';
-import { ENROLLED_COURSES, getCourseBySlug } from '../data';
+import { ENROLLED_COURSES, getCourseBySlug, getCapstonesForWeek, getCapstonesForClass, ALL_CAPSTONES } from '../data';
 import { adminCourseApi } from '../services/adminCourseApi';
 
 
@@ -153,6 +153,7 @@ function WeekAccordion({
               const cls = classes[String(classId)];
               if (!cls) return null;
               const done = ProgressService.isClassCompleted(classId);
+              const classCapstones = getCapstonesForClass(classId);
 
               if (isLocked) {
                 return (
@@ -169,6 +170,19 @@ function WeekAccordion({
                         <div className="class-row-num">{classId === 0 ? 'Prerequisites' : `Class ${String(classId).padStart(2, '0')}`}</div>
                         <div className="class-row-title">{cls.short}</div>
                         {cls.description && <div className="class-row-desc">{cls.description}</div>}
+                        {classCapstones.length > 0 && (
+                          <div className="class-row-capstones">
+                            {classCapstones.map(c => (
+                              <span
+                                key={c.slug}
+                                className="class-capstone-tag"
+                                style={{ color: c.color, borderColor: `${c.color}40`, backgroundColor: `${c.color}15` }}
+                              >
+                                <Layers size={10} /> {c.short}
+                              </span>
+                            ))}
+                          </div>
+                        )}
                       </div>
                     </div>
                     <div className="class-row-right">
@@ -191,6 +205,19 @@ function WeekAccordion({
                       <div className="class-row-num">{classId === 0 ? 'Prerequisites' : `Class ${String(classId).padStart(2, '0')}`}</div>
                       <div className="class-row-title">{cls.short}</div>
                       {cls.description && <div className="class-row-desc">{cls.description}</div>}
+                      {classCapstones.length > 0 && (
+                        <div className="class-row-capstones">
+                          {classCapstones.map(c => (
+                            <span
+                              key={c.slug}
+                              className="class-capstone-tag"
+                              style={{ color: c.color, borderColor: `${c.color}40`, backgroundColor: `${c.color}15` }}
+                            >
+                              <Layers size={10} /> {c.short}
+                            </span>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   </div>
                   <div className="class-row-right">
@@ -204,6 +231,100 @@ function WeekAccordion({
               );
             })}
           </div>
+
+          {/* Related Capstone Projects for this Week */}
+          {week.n === 0 ? (
+            <div className="week-projects-section week-projects-section--prereq">
+              <div className="week-projects-header">
+                <div className="week-projects-title-wrap">
+                  <Layers size={14} className="week-projects-icon" />
+                  <span className="week-projects-heading">Capstone Environment Prerequisite</span>
+                </div>
+                <span className="week-projects-subtitle">
+                  Completing this setup configures the runtimes, vector databases, and APIs for all 4 enterprise capstones:
+                </span>
+              </div>
+              <div className="week-prereq-capstones-grid">
+                {ALL_CAPSTONES.map(cap => (
+                  <Link
+                    key={cap.slug}
+                    to={`/capstones/${cap.slug}`}
+                    className="week-prereq-capstone-chip"
+                    title={`Explore ${cap.title}`}
+                    onClick={() => ProgressService.markProjectStarted(cap.slug, cap.title)}
+                  >
+                    <span className="week-prereq-dot" style={{ background: cap.color }} />
+                    <span className="week-prereq-chip-title">{cap.short}</span>
+                    <span className="week-prereq-chip-domain">{cap.domain}</span>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          ) : (() => {
+            const weekCapstones = getCapstonesForWeek(week.n);
+            if (weekCapstones.length === 0) return null;
+            return (
+              <div className="week-projects-section">
+                <div className="week-projects-header">
+                  <div className="week-projects-title-wrap">
+                    <Layers size={14} className="week-projects-icon" />
+                    <span className="week-projects-heading">
+                      Related Capstone Project{weekCapstones.length > 1 ? 's' : ''}
+                    </span>
+                    <span className="week-projects-badge">
+                      {weekCapstones.length} {weekCapstones.length === 1 ? 'project' : 'projects'}
+                    </span>
+                  </div>
+                  <span className="week-projects-subtitle">
+                    Applied production systems built using this week's architectures and tools
+                  </span>
+                </div>
+
+                <div className="week-projects-list">
+                  {weekCapstones.map(cap => {
+                    const isStarted = ProgressService.isProjectStarted(cap.slug);
+                    const highlight = cap.weekHighlight?.[week.n];
+                    return (
+                      <div key={cap.slug} className="week-project-item">
+                        <div className="week-project-left">
+                          <div
+                            className="week-project-domain-pill"
+                            style={{ borderColor: `${cap.color}60`, color: cap.color, background: `${cap.color}10` }}
+                          >
+                            {cap.domain}
+                          </div>
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <div className="week-project-title-row">
+                              <h4 className="week-project-title">{cap.title}</h4>
+                              {isStarted && (
+                                <span className="week-project-status-badge">
+                                  <CheckCircle size={11} /> Started
+                                </span>
+                              )}
+                            </div>
+                            <p className="week-project-desc">{highlight || cap.description}</p>
+                            <div className="week-project-meta-row">
+                              <span className="week-project-meta-tag"><strong>Pattern:</strong> {cap.pattern}</span>
+                              <span className="week-project-meta-tag"><strong>Key Metric:</strong> {cap.metric}</span>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="week-project-right">
+                          <Link
+                            to={`/capstones/${cap.slug}`}
+                            className="btn btn--sm btn--outline week-project-btn"
+                            onClick={() => ProgressService.markProjectStarted(cap.slug, cap.title)}
+                          >
+                            {isStarted ? 'Continue Project' : 'Explore Project'} <ArrowRight size={13} />
+                          </Link>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })()}
         </div>
       )}
     </div>

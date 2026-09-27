@@ -201,7 +201,7 @@ export function PracticePage() {
                   {done ? <CheckCircle size={18} color="#10B981" /> : <FlaskConical size={18} />}
                 </div>
                 <div className="lab-card-meta">
-                  <span className="lab-class-tag">Class {lab.classId}</span>
+                  <span className="lab-class-tag">{lab.classId === 0 ? 'Prerequisites' : `Class ${lab.classId}`}</span>
                   <span className="lab-time"><Clock size={12} /> {lab.estimatedTime}</span>
                 </div>
               </div>

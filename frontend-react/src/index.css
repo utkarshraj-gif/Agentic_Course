@@ -7372,3 +7372,354 @@ textarea.input::placeholder {
   background: rgba(7, 210, 224, 0.18);
   border-color: rgba(7, 210, 224, 0.4);
 }
+
+/* ==========================================================
+   RELATED CAPSTONE PROJECTS IN WEEKS & LESSONS
+   ========================================================== */
+
+.class-row-capstones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 5px;
+}
+
+.class-capstone-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.68rem;
+  font-weight: 600;
+  padding: 1px 7px;
+  border-radius: 4px;
+  border: 1px solid;
+  letter-spacing: 0.02em;
+}
+
+.week-projects-section {
+  margin-top: 1.5rem;
+  padding: 1.25rem;
+  border-radius: var(--radius-lg);
+  background: linear-gradient(135deg, rgba(7, 210, 224, 0.04) 0%, rgba(139, 92, 246, 0.04) 100%);
+  border: 1px solid rgba(7, 210, 224, 0.2);
+}
+
+.week-projects-section--prereq {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.04) 0%, rgba(7, 210, 224, 0.04) 100%);
+  border-color: rgba(16, 185, 129, 0.2);
+}
+
+.week-projects-header {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 1rem;
+}
+
+.week-projects-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.week-projects-icon {
+  color: var(--primary);
+}
+
+.week-projects-heading {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--text-main);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.week-projects-badge {
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 9999px;
+  background: var(--bg-light);
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+}
+
+.week-projects-subtitle {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.week-projects-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.week-project-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.25rem;
+  padding: 1rem 1.15rem;
+  background: var(--bg-white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  transition: all var(--transition);
+}
+
+.week-project-item:hover {
+  border-color: var(--primary);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+}
+
+.week-project-left {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  flex: 1;
+  min-width: 0;
+}
+
+.week-project-domain-pill {
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 4px;
+  border: 1px solid;
+  background: var(--bg-white);
+  white-space: nowrap;
+  margin-top: 2px;
+}
+
+.week-project-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.week-project-title {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin: 0;
+}
+
+.week-project-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--green);
+  background: rgba(16, 185, 129, 0.1);
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+
+.week-project-desc {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin: 4px 0 6px;
+  line-height: 1.4;
+}
+
+.week-project-meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+.week-project-btn {
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.week-prereq-capstones-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.week-prereq-capstone-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: var(--bg-white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  transition: all var(--transition);
+}
+
+.week-prereq-capstone-chip:hover {
+  border-color: var(--primary);
+  background: var(--bg-light);
+}
+
+.week-prereq-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.week-prereq-chip-title {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.week-prereq-chip-domain {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  margin-left: auto;
+}
+
+/* Lesson level capstone integration */
+.lesson-capstone-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.lesson-capstone-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 6px;
+  background: rgba(7, 210, 224, 0.08);
+  border: 1px solid rgba(7, 210, 224, 0.25);
+  color: var(--text-main);
+  text-decoration: none;
+  transition: all var(--transition);
+}
+
+.lesson-capstone-chip:hover {
+  background: rgba(7, 210, 224, 0.16);
+  border-color: var(--primary);
+  transform: translateY(-1px);
+}
+
+.lesson-capstone-spotlight {
+  margin: 2.5rem 0;
+  padding: 1.5rem;
+  background: linear-gradient(135deg, rgba(7, 210, 224, 0.04) 0%, rgba(139, 92, 246, 0.04) 100%);
+  border: 1px solid rgba(7, 210, 224, 0.25);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.02);
+}
+
+.lesson-capstone-spotlight-header {
+  margin-bottom: 1.25rem;
+}
+
+.lesson-capstone-spotlight-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--primary);
+  background: rgba(7, 210, 224, 0.1);
+  padding: 3px 9px;
+  border-radius: 4px;
+  margin-bottom: 0.5rem;
+}
+
+.lesson-capstone-spotlight-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin: 0 0 0.4rem 0;
+}
+
+.lesson-capstone-spotlight-intro {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.lesson-capstone-cards-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.lesson-capstone-card {
+  background: var(--bg-white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 1.25rem;
+  transition: all var(--transition);
+}
+
+.lesson-capstone-card:hover {
+  border-color: var(--primary);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
+}
+
+.lesson-capstone-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.lesson-capstone-domain {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  display: block;
+  margin-bottom: 2px;
+}
+
+.lesson-capstone-card-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin: 0;
+}
+
+.lesson-capstone-cta {
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.lesson-capstone-card-highlight {
+  font-size: 0.825rem;
+  color: var(--text-main);
+  background: rgba(7, 210, 224, 0.06);
+  border-left: 3px solid var(--primary);
+  padding: 0.6rem 0.85rem;
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  margin: 0.85rem 0;
+  line-height: 1.5;
+}
+
+.lesson-capstone-card-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  border-top: 1px solid var(--border-light, #f0f0f0);
+  padding-top: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.lesson-capstone-tools {
+  display: flex;
+  gap: 4px;
+  margin-left: auto;
+}

@@ -10,6 +10,7 @@ export interface Course {
   level: string;
   icon: string;
   description: string;
+  short_description?: string;
   enrolled: boolean;
   bannerImage?: string;
   totalWeeks?: number;

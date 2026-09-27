@@ -1,8 +1,9 @@
 import { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { CheckCircle, Code, Copy, ChevronLeft, Bookmark, BookmarkCheck, Clock, Tag, Maximize2, Minimize2, Lock, ArrowRight } from 'lucide-react';
+import { CheckCircle, Code, Copy, ChevronLeft, Bookmark, BookmarkCheck, Clock, Tag, Maximize2, Minimize2, Lock, ArrowRight, Layers } from 'lucide-react';
 import { ProgressService, DEFAULT_WEEKS } from '../../services/progress/ProgressService';
 import { BookmarkService } from '../../services/bookmarks/BookmarkService';
+import { getCapstonesForClass, ALL_CAPSTONES } from '../../data';
 import { LessonQuiz } from './LessonQuiz';
 import { LessonAudioPlayer } from './LessonAudioPlayer';
 import { getQuizForClass } from '../../data/quizData';
@@ -243,7 +244,7 @@ export function ClassDetail() {
             <span aria-hidden="true">/</span>
             <Link to="/curriculum">Courses</Link>
             <span aria-hidden="true">/</span>
-            <span className="current" aria-current="page">Class {String(classId).padStart(2, '0')} (Locked)</span>
+            <span className="current" aria-current="page">{classId === 0 ? 'Prerequisites (Locked)' : `Class ${String(classId).padStart(2, '0')} (Locked)`}</span>
           </nav>
         </div>
 
@@ -252,7 +253,7 @@ export function ClassDetail() {
             <div className="lesson-locked-badge">
               <Lock size={32} />
             </div>
-            <h2 className="lesson-locked-title">Class {String(classId).padStart(2, '0')} is Locked</h2>
+            <h2 className="lesson-locked-title">{classId === 0 ? 'Prerequisites is Locked' : `Class ${String(classId).padStart(2, '0')} is Locked`}</h2>
             <p className="lesson-locked-subtitle">
               Prerequisite Required: Complete Week {prevWeekNum} First
             </p>
@@ -267,7 +268,7 @@ export function ClassDetail() {
             </div>
             <div className="lesson-locked-actions">
               <Link to={`/class/${firstIncompletePrereq}`} className="btn btn--primary">
-                Resume with Class {String(firstIncompletePrereq).padStart(2, '0')} <ArrowRight size={14} />
+                {firstIncompletePrereq === 0 ? 'Resume with Prerequisites' : `Resume with Class ${String(firstIncompletePrereq).padStart(2, '0')}`} <ArrowRight size={14} />
               </Link>
               <Link to="/curriculum" className="btn btn--outline">
                 View Courses
@@ -288,13 +289,13 @@ export function ClassDetail() {
             <span aria-hidden="true">/</span>
             <Link to="/curriculum">Courses</Link>
             <span aria-hidden="true">/</span>
-            <span className="current" aria-current="page">Class {classId} (Unavailable)</span>
+            <span className="current" aria-current="page">{classId === 0 ? 'Prerequisites (Unavailable)' : `Class ${classId} (Unavailable)`}</span>
           </nav>
         </div>
 
         <div className="lesson-locked-container">
           <div className="lesson-locked-card">
-            <h2 className="lesson-locked-title">Unable to Load Class {classId}</h2>
+            <h2 className="lesson-locked-title">{classId === 0 ? 'Unable to Load Prerequisites' : `Unable to Load Class ${classId}`}</h2>
             <p className="lesson-locked-subtitle">{error}</p>
             <div className="lesson-locked-actions" style={{ marginTop: '1.5rem' }}>
               <button onClick={() => window.location.reload()} className="btn btn--primary">
@@ -314,7 +315,11 @@ export function ClassDetail() {
     return <LessonDetailSkeleton classId={classId} />;
   }
 
-  const tocItems = parseToc(data.toc ?? []);
+  const relatedCapstones = classId === 0 ? ALL_CAPSTONES : getCapstonesForClass(classId);
+  const baseToc = parseToc(data.toc ?? []);
+  const tocItems = relatedCapstones.length > 0
+    ? [...baseToc, { text: classId === 0 ? 'Capstone Prerequisites' : 'Applied Capstone', id: 'applied-capstone' }]
+    : baseToc;
 
   return (
     <div className="lesson-page">
@@ -376,6 +381,28 @@ export function ClassDetail() {
                 <div className="lesson-tools">
                   {data.meta.tools.map((t: string) => (
                     <span key={t} className="tool-badge">{t}</span>
+                  ))}
+                </div>
+              </div>
+            )}
+            {relatedCapstones.length > 0 && (
+              <div className="lesson-meta-row">
+                <span className="lesson-meta-label">
+                  {classId === 0 ? 'Foundation For Capstones:' : 'Related Capstone:'}
+                </span>
+                <div className="lesson-capstone-chips">
+                  {relatedCapstones.map(cap => (
+                    <Link
+                      key={cap.slug}
+                      to={`/capstones/${cap.slug}`}
+                      className="lesson-capstone-chip"
+                      title={`Explore ${cap.title}`}
+                      onClick={() => ProgressService.markProjectStarted(cap.slug, cap.title)}
+                    >
+                      <Layers size={12} color={cap.color} />
+                      <span>{cap.short}</span>
+                      <ArrowRight size={10} />
+                    </Link>
                   ))}
                 </div>
               </div>
@@ -666,6 +693,61 @@ export function ClassDetail() {
                 )}
               </div>
             </div>
+          )}
+
+          {/* Applied Enterprise Capstone Project Spotlight */}
+          {relatedCapstones.length > 0 && (
+            <section className="lesson-capstone-spotlight" id="applied-capstone">
+              <div className="lesson-capstone-spotlight-header">
+                <div className="lesson-capstone-spotlight-badge">
+                  <Layers size={14} /> {classId === 0 ? 'CAPSTONE PREREQUISITES' : 'APPLIED ENTERPRISE CAPSTONE'}
+                </div>
+                <h3 className="lesson-capstone-spotlight-title">
+                  {classId === 0 ? 'Foundation For All Enterprise Capstones' : 'How this class connects to production systems'}
+                </h3>
+                <p className="lesson-capstone-spotlight-intro">
+                  {classId === 0
+                    ? 'Completing this environment setup ensures you have the necessary runtime, vector stores, and multi-agent frameworks to build all 4 enterprise capstone projects:'
+                    : `The architectural patterns, tools, and code techniques in this lesson are applied directly in the following production-grade capstone project${relatedCapstones.length > 1 ? 's' : ''}:`}
+                </p>
+              </div>
+
+              <div className="lesson-capstone-cards-list">
+                {relatedCapstones.map(cap => {
+                  const isStarted = ProgressService.isProjectStarted(cap.slug);
+                  const highlight = cap.classHighlight?.[classId] || cap.description;
+                  return (
+                    <div key={cap.slug} className="lesson-capstone-card">
+                      <div className="lesson-capstone-card-top">
+                        <div>
+                          <span className="lesson-capstone-domain" style={{ color: cap.color }}>{cap.domain}</span>
+                          <h4 className="lesson-capstone-card-title">{cap.title}</h4>
+                        </div>
+                        <Link
+                          to={`/capstones/${cap.slug}`}
+                          className="btn btn--sm btn--primary lesson-capstone-cta"
+                          onClick={() => ProgressService.markProjectStarted(cap.slug, cap.title)}
+                        >
+                          {isStarted ? 'Resume Capstone' : 'Open Capstone'} <ArrowRight size={13} />
+                        </Link>
+                      </div>
+                      <p className="lesson-capstone-card-highlight">
+                        💡 <strong>Applied in this lesson:</strong> {highlight}
+                      </p>
+                      <div className="lesson-capstone-card-footer">
+                        <span className="lesson-capstone-pattern"><strong>Pattern:</strong> {cap.pattern}</span>
+                        <span className="lesson-capstone-metric"><strong>Metric:</strong> {cap.metric}</span>
+                        <div className="lesson-capstone-tools">
+                          {cap.tools.slice(0, 3).map(t => (
+                            <span key={t} className="tool-badge tool-badge--sm">{t}</span>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </section>
           )}
 
           {/* Knowledge Check */}
