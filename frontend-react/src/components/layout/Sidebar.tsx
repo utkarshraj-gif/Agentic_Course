@@ -1,4 +1,5 @@
 // components/layout/Sidebar.tsx
+import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard, BookOpen, Layers, FlaskConical, Map, Search,
@@ -52,6 +53,9 @@ export function Sidebar({ classes, refreshKey, mobileOpen, onMobileClose }: Side
     window.addEventListener('progress_updated', handler);
     return () => window.removeEventListener('progress_updated', handler);
   }, []);
+
+  void refreshKey;
+  void tick;
 
   const completedCount = classList.filter(cls => ProgressService.isClassCompleted(cls.id)).length;
   const firstIncomplete = classList.find(cls => !ProgressService.isClassCompleted(cls.id));
