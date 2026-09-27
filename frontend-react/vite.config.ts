@@ -9,7 +9,11 @@ export default defineConfig({
     host: true,
     watch: {
       usePolling: true,
-      interval: 1000,
+      interval: 100,
+      ignored: ['**/node_modules/**', '**/.git/**', '**/dist/**'],
+    },
+    hmr: {
+      overlay: true,
     },
     proxy: {
       '/api': {

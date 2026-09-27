@@ -45,10 +45,16 @@ export function Sidebar({ classes, refreshKey, mobileOpen, onMobileClose }: Side
     return location.pathname.startsWith(to);
   };
 
-  void refreshKey;
+  const [tick, setTick] = useState(0);
 
-  const completedCount = classList.filter(cls => ProgressService.isLessonComplete(cls.id)).length;
-  const firstIncomplete = classList.find(cls => !ProgressService.isLessonComplete(cls.id));
+  useEffect(() => {
+    const handler = () => setTick(t => t + 1);
+    window.addEventListener('progress_updated', handler);
+    return () => window.removeEventListener('progress_updated', handler);
+  }, []);
+
+  const completedCount = classList.filter(cls => ProgressService.isClassCompleted(cls.id)).length;
+  const firstIncomplete = classList.find(cls => !ProgressService.isClassCompleted(cls.id));
   const upNextId = firstIncomplete ? firstIncomplete.id : null;
 
   const CLASS_DURATIONS: Record<number, string> = {

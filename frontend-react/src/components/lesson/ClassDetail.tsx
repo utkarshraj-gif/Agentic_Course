@@ -160,14 +160,31 @@ export function ClassDetail() {
     }
   }, [data]);
 
-  const isClassLocked = !ProgressService.isClassUnlocked(classId);
+  const [isLocked, setIsLocked] = useState(() => !ProgressService.isClassUnlocked(classId));
   const parentWeek = ProgressService.getParentWeek(classId);
   const prevWeekNum = parentWeek ? parentWeek.n - 1 : 1;
   const prevWeek = DEFAULT_WEEKS.find(w => w.n === prevWeekNum);
   const firstIncompletePrereq = prevWeek?.classes.find(id => !ProgressService.isClassCompleted(id)) || 1;
 
+  // Scroll to top and re-evaluate lock state on route navigation
   useEffect(() => {
-    if (isClassLocked) return;
+    window.scrollTo({ top: 0, behavior: 'instant' });
+    setIsLocked(!ProgressService.isClassUnlocked(classId));
+  }, [classId]);
+
+  // Synchronize completion and unlock state in real-time
+  useEffect(() => {
+    const handleProgressUpdate = () => {
+      const completed = ProgressService.isClassCompleted(classId);
+      setIsCompleted(completed);
+      setIsLocked(!ProgressService.isClassUnlocked(classId));
+    };
+    window.addEventListener('progress_updated', handleProgressUpdate);
+    return () => window.removeEventListener('progress_updated', handleProgressUpdate);
+  }, [classId]);
+
+  useEffect(() => {
+    if (isLocked) return;
     setData(null);
     setError(null);
     setTtsSentences([]);
@@ -201,17 +218,7 @@ export function ClassDetail() {
         console.error(err);
         setError(err.message || 'Error loading class');
       });
-  }, [classId, isClassLocked]);
-
-  // Synchronize completion in real-time when quiz is submitted
-  useEffect(() => {
-    const handleProgressUpdate = () => {
-      const completed = ProgressService.isClassCompleted(classId);
-      setIsCompleted(completed);
-    };
-    window.addEventListener('progress_updated', handleProgressUpdate);
-    return () => window.removeEventListener('progress_updated', handleProgressUpdate);
-  }, [classId]);
+  }, [classId, isLocked]);
 
   const handleBookmark = () => {
     if (!data) return;
@@ -227,7 +234,7 @@ export function ClassDetail() {
 
   const quiz = getQuizForClass(classId);
 
-  if (isClassLocked) {
+  if (isLocked) {
     return (
       <div className="lesson-page">
         <div className="lesson-topbar">

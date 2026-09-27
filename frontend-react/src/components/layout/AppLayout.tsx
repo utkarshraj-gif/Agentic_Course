@@ -1,6 +1,6 @@
 // components/layout/AppLayout.tsx
 import { useState, useEffect } from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
 import { Sidebar } from './Sidebar';
 import { API_BASE } from '../../services/api';
@@ -19,6 +19,7 @@ export function AppLayout() {
   const [overview, setOverview] = useState<OverviewData | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const location = useLocation();
 
   const fetchCurriculum = () => {
     fetch(`${API_BASE}/curriculum?_t=${Date.now()}`, { cache: 'no-store' })
@@ -30,6 +31,12 @@ export function AppLayout() {
   useEffect(() => {
     fetchCurriculum();
   }, []);
+
+  useEffect(() => {
+    if (!overview) {
+      fetchCurriculum();
+    }
+  }, [location.pathname, overview]);
 
   useEffect(() => {
     const handler = () => setRefreshKey(k => k + 1);
