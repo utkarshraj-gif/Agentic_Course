@@ -33,11 +33,15 @@ export function Sidebar({ classes, refreshKey, mobileOpen, onMobileClose }: Side
   const { user, logout } = useAuth();
   const classList = Object.values(classes).sort((a, b) => a.id - b.id);
 
-  const isCoursesOpen = location.pathname === '/curriculum' || location.pathname.startsWith('/class/');
+  const isCoursesOpen = location.pathname.startsWith('/curriculum/') || location.pathname.startsWith('/class/');
+  const isOnCurriculumRoot = location.pathname === '/curriculum';
+
+  const isCoursesActive = isCoursesOpen || isOnCurriculumRoot;
+  void isOnCurriculumRoot;
 
   const isActive = (to: string) => {
     if (to === '/dashboard') return location.pathname === '/dashboard' || location.pathname === '/overview';
-    if (to === '/curriculum') return isCoursesOpen;
+    if (to === '/curriculum') return isCoursesActive;
     return location.pathname.startsWith(to);
   };
 

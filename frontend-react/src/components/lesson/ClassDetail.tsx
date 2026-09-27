@@ -38,6 +38,7 @@ interface ClassDetailData {
 }
 
 const ESTIMATED_TIMES: Record<number, string> = {
+  0: '30 min',
   1: '45 min', 2: '50 min', 3: '55 min', 4: '50 min',
   5: '60 min', 6: '60 min', 7: '55 min', 8: '50 min',
   9: '65 min', 10: '55 min', 11: '60 min', 12: '70 min',
@@ -57,6 +58,7 @@ export function ClassDetail() {
   const classId = Number(id);
 
   const [data, setData] = useState<ClassDetailData | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const [ttsSentences, setTtsSentences] = useState<TtsSentence[]>([]);
   const [activeTab, setActiveTab] = useState(0);
   const [copied, setCopied] = useState(false);
@@ -167,11 +169,20 @@ export function ClassDetail() {
   useEffect(() => {
     if (isClassLocked) return;
     setData(null);
+    setError(null);
     setTtsSentences([]);
     setActiveTab(0);
     fetch(`${API_BASE}/curriculum/classes/${classId}`)
-      .then(res => res.json())
+      .then(res => {
+        if (!res.ok) {
+          throw new Error(`Failed to load class: HTTP ${res.status}`);
+        }
+        return res.json();
+      })
       .then(d => {
+        if (!d || !d.html) {
+          throw new Error('Lesson content is unavailable');
+        }
         const { annotatedHtml, sentences } = annotateHtmlForTts(d.html, classId, d.short || d.title);
         d.html = annotatedHtml;
         setTtsSentences(sentences);
@@ -184,7 +195,10 @@ export function ClassDetail() {
         ProgressService.setLastVisited(classId, d.short || d.title);
         window.dispatchEvent(new Event('progress_updated'));
       })
-      .catch(console.error);
+      .catch(err => {
+        console.error(err);
+        setError(err.message || 'Error loading class');
+      });
   }, [classId, isClassLocked]);
 
   // Synchronize completion in real-time when quiz is submitted
@@ -256,6 +270,37 @@ export function ClassDetail() {
     );
   }
 
+  if (error) {
+    return (
+      <div className="lesson-page">
+        <div className="lesson-topbar">
+          <nav className="lesson-breadcrumb" aria-label="Breadcrumb">
+            <Link to="/dashboard">Overview</Link>
+            <span aria-hidden="true">/</span>
+            <Link to="/curriculum">Courses</Link>
+            <span aria-hidden="true">/</span>
+            <span className="current" aria-current="page">Class {classId} (Unavailable)</span>
+          </nav>
+        </div>
+
+        <div className="lesson-locked-container">
+          <div className="lesson-locked-card">
+            <h2 className="lesson-locked-title">Unable to Load Class {classId}</h2>
+            <p className="lesson-locked-subtitle">{error}</p>
+            <div className="lesson-locked-actions" style={{ marginTop: '1.5rem' }}>
+              <button onClick={() => window.location.reload()} className="btn btn--primary">
+                Try Again
+              </button>
+              <Link to="/curriculum" className="btn btn--outline">
+                Back to Courses
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (!data) {
     return <LessonDetailSkeleton classId={classId} />;
   }
@@ -271,7 +316,9 @@ export function ClassDetail() {
           <span aria-hidden="true">/</span>
           <Link to="/curriculum">Courses</Link>
           <span aria-hidden="true">/</span>
-          <span aria-current="page">Class {classId}</span>
+          <span aria-current="page">
+            {classId === 0 ? 'Class 00 · Prerequisites' : `Class ${String(classId).padStart(2, '0')}`}
+          </span>
         </nav>
         <div className="lesson-controls">
           <button
@@ -296,7 +343,9 @@ export function ClassDetail() {
       <div className="lesson-header">
         <div className="lesson-header-inner">
           <div className="lesson-header-meta">
-            <span className="lesson-tag"><Tag size={12} /> Week {data.week}</span>
+            <span className="lesson-tag">
+              <Tag size={12} /> {data.week === 0 ? 'Prerequisites (Week 0)' : `Week ${data.week}`}
+            </span>
             <span className="lesson-tag"><Clock size={12} /> {ESTIMATED_TIMES[classId] ?? '45 min'}</span>
             {isCompleted && (
               <span className="lesson-tag lesson-tag--done">

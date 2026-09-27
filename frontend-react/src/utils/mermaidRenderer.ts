@@ -112,25 +112,52 @@ export function parseMermaidFlowchart(diagCode: string): DiagramGraph {
   const rawDir = directionMatch ? directionMatch[1].toUpperCase() : 'LR';
   const direction = rawDir === 'TD' || rawDir === 'TB' ? 'DOWN' : 'RIGHT';
 
-  // 1. Extract node definitions in exact linear order of appearance in Mermaid flowchart
+  // 1. Extract subgraph headers as semantic containers/nodes
+  const subgraphRegex = /subgraph\s+([A-Za-z0-9_]+)(?:\s*\[\s*["']?([\s\S]*?)["']?\s*\])?/g;
+  let sgMatch: RegExpExecArray | null;
+  while ((sgMatch = subgraphRegex.exec(diagCode)) !== null) {
+    const id = sgMatch[1];
+    const rawLabel = (sgMatch[2] || id).replace(/<br\s*\/?>/gi, '\n').trim();
+    const lines = rawLabel.split('\n').map((s) => s.trim().replace(/^["']|["']$/g, '')).filter(Boolean);
+    nodesMap.set(id, {
+      id,
+      label: lines[0] || id,
+      subtitle: lines.slice(1).join(' · ') || undefined,
+      type: 'service',
+    });
+  }
+
+  // 2. Extract node definitions in exact order
   // Matches:
   // - Database cylinder: id[(content)]
   // - Decision diamond: id{content}
-  // - Standard rect: id[content]
-  const nodeDefRegex = /([A-Za-z0-9_]+)(?:\[\(([\s\S]*?)\)\]|\{([\s\S]*?)\}|\[([^()\[\]]*?)\])/g;
+  // - Rounded rect: id([content])
+  // - Circle: id((content))
+  // - Standard rect: id[content] or id["content"]
+  const nodeDefRegex = /([A-Za-z0-9_]+)(?:\[\(([\s\S]*?)\)\]|\{([\s\S]*?)\}|\(\[([\s\S]*?)\]\)|\(\(([\s\S]*?)\)\)|\[([\s\S]*?)\])/g;
   let m: RegExpExecArray | null;
   while ((m = nodeDefRegex.exec(diagCode)) !== null) {
     const id = m[1];
+    if (id.toLowerCase() === 'subgraph' || id.toLowerCase() === 'flowchart' || id.toLowerCase() === 'graph' || id.toLowerCase() === 'end') continue;
     if (nodesMap.has(id)) continue;
+    
     const dbText = m[2];
     const diamondText = m[3];
-    const rectText = m[4];
+    const roundedText = m[4];
+    const circleText = m[5];
+    const rectText = m[6];
+    
     const isDb = dbText !== undefined;
     const isDiamond = diamondText !== undefined;
-    const rawContent = (dbText || diamondText || rectText || '').replace(/<br\s*\/?>/gi, '\n').replace(/['"]/g, '').trim();
-    const lines = rawContent.split('\n').map((s) => s.trim()).filter(Boolean);
+    const rawContent = (dbText || diamondText || roundedText || circleText || rectText || '')
+      .replace(/<br\s*\/?>/gi, '\n')
+      .replace(/^["']|["']$/g, '')
+      .trim();
+      
+    const lines = rawContent.split('\n').map((s) => s.trim().replace(/^["']|["']$/g, '')).filter(Boolean);
     const label = lines[0] || id;
     const isUser = /user|clinic|doctor|clinician|human|analyst|operator|client/i.test(label);
+    
     nodesMap.set(id, {
       id,
       label,
@@ -140,45 +167,87 @@ export function parseMermaidFlowchart(diagCode: string): DiagramGraph {
     });
   }
 
-  // Filter out comments and subgraphs before edge parsing
-  const edgeLines = diagCode
-    .split('\n')
-    .map((l) => l.trim())
-    .filter((l) => !l.startsWith('subgraph') && l !== 'end' && !l.startsWith('%%') && !l.startsWith('classDef'));
+  // 3. Robust Line-by-Line Arrow & Edge Parsing
+  // Handles:
+  // - Chained edges: A --> B --> C --> D
+  // - Multi-nodes with &: A & B --> C & D
+  // - Labeled edges: A -->|step 1| B
+  // - Dotted/animated edges: A -.-> B
+  // - Thick edges: A ==> B
+  const lines = diagCode.split('\n');
+  for (const rawLine of lines) {
+    const line = rawLine.trim();
+    if (!line || line.startsWith('%%') || line.startsWith('classDef') || line.startsWith('style') || line === 'end') {
+      continue;
+    }
 
-  const cleanText = edgeLines.join('\n');
+    // Check if line contains an arrow operator
+    if (!/(-->|-\.->|==>)/.test(line)) {
+      continue;
+    }
 
-  // 4. Edges with labels: A -->|label| B or A -.->|label| B or A ==>|label| B
-  const edgeLabeledRegex = /([A-Za-z0-9_]+)(?:\[.*?\]|\(.*?\)|[\(\{].*?[\)\}])?\s*(-->|-\.->|==>)\s*(?:\|([^|]*)\|)\s*([A-Za-z0-9_]+)/g;
-  while ((m = edgeLabeledRegex.exec(cleanText)) !== null) {
-    const src = m[1];
-    const tgt = m[4];
-    const lbl = (m[3] || '').trim();
-    if (!nodesMap.has(src)) nodesMap.set(src, { id: src, label: src, type: 'service' });
-    if (!nodesMap.has(tgt)) nodesMap.set(tgt, { id: tgt, label: tgt, type: 'service' });
-    edges.push({
-      id: `e_${++edgeSeq}`,
-      source: src,
-      target: tgt,
-      label: lbl,
-      animated: m[2].includes('-.->'),
-    });
-  }
+    // Split line by arrow operators while preserving operator and optional label |...|
+    const arrowPattern = /\s*(-->|-\.->|==>)\s*(?:\|([^|]*)\|)?\s*/g;
+    let lastIndex = 0;
+    const segments: { nodeText: string; arrowOp?: string; label?: string }[] = [];
+    let arrowMatch: RegExpExecArray | null;
 
-  // 5. Plain edges: A --> B or A -.-> B or A ==> B
-  const edgePlainRegex = /([A-Za-z0-9_]+)(?:\[.*?\]|\(.*?\)|[\(\{].*?[\)\}])?\s*(-->|-\.->|==>)\s*(?!(?:\|[^|]*\|))\s*([A-Za-z0-9_]+)/g;
-  while ((m = edgePlainRegex.exec(cleanText)) !== null) {
-    const src = m[1];
-    const tgt = m[3];
-    if (src.toLowerCase() === 'flowchart' || src.toLowerCase() === 'subgraph' || src.toLowerCase() === 'graph') continue;
-    if (!nodesMap.has(src)) nodesMap.set(src, { id: src, label: src, type: 'service' });
-    if (!nodesMap.has(tgt)) nodesMap.set(tgt, { id: tgt, label: tgt, type: 'service' });
-    edges.push({
-      id: `e_${++edgeSeq}`,
-      source: src,
-      target: tgt,
-      animated: m[2].includes('-.->'),
-    });
+    while ((arrowMatch = arrowPattern.exec(line)) !== null) {
+      const nodeText = line.substring(lastIndex, arrowMatch.index).trim();
+      segments.push({
+        nodeText,
+        arrowOp: arrowMatch[1],
+        label: arrowMatch[2] ? arrowMatch[2].trim() : undefined,
+      });
+      lastIndex = arrowPattern.lastIndex;
+    }
+    const finalNodeText = line.substring(lastIndex).trim();
+    if (finalNodeText) {
+      segments.push({ nodeText: finalNodeText });
+    }
+
+    // Helper to extract node IDs from a segment (handles "A", "A[text]", "A & B & C")
+    const extractIds = (segText: string): string[] => {
+      const parts = segText.split('&').map((p) => p.trim()).filter(Boolean);
+      const ids: string[] = [];
+      for (const part of parts) {
+        const idMatch = part.match(/^([A-Za-z0-9_]+)/);
+        if (idMatch) {
+          const id = idMatch[1];
+          if (id.toLowerCase() !== 'subgraph' && id.toLowerCase() !== 'flowchart' && id.toLowerCase() !== 'graph') {
+            ids.push(id);
+            if (!nodesMap.has(id)) {
+              nodesMap.set(id, { id, label: id, type: 'service' });
+            }
+          }
+        }
+      }
+      return ids;
+    };
+
+    // Connect sequential segments: (segments[0] -> segments[1]), (segments[1] -> segments[2]), etc.
+    for (let i = 0; i < segments.length - 1; i++) {
+      const current = segments[i];
+      const next = segments[i + 1];
+      if (!current.arrowOp) continue;
+
+      const sourceIds = extractIds(current.nodeText);
+      const targetIds = extractIds(next.nodeText);
+      const isAnimated = current.arrowOp.includes('-.->');
+
+      for (const src of sourceIds) {
+        for (const tgt of targetIds) {
+          if (src === tgt) continue;
+          edges.push({
+            id: `e_${++edgeSeq}`,
+            source: src,
+            target: tgt,
+            label: current.label,
+            animated: isAnimated,
+          });
+        }
+      }
+    }
   }
 
   return {

@@ -10,7 +10,8 @@ import {
   LayoutDashboard,
   Shield,
   Menu,
-  X
+  X,
+  BookOpen
 } from 'lucide-react';
 import { useAdminAuth } from '../../services/admin/AdminAuthContext';
 
@@ -77,6 +78,14 @@ export function AdminLayout() {
             <span>Overview</span>
           </NavLink>
           <NavLink
+            to="/admin/courses"
+            className={({ isActive }) => `sidebar-nav-item ${isActive ? 'sidebar-nav-item--active' : ''}`}
+            onClick={() => setMobileOpen(false)}
+          >
+            <BookOpen size={16} />
+            <span>Course Management</span>
+          </NavLink>
+          <NavLink
             to="/admin/learners"
             className={({ isActive }) => `sidebar-nav-item ${isActive ? 'sidebar-nav-item--active' : ''}`}
             onClick={() => setMobileOpen(false)}
@@ -101,12 +110,20 @@ export function AdminLayout() {
             <span>Hands-on Labs</span>
           </NavLink>
           <NavLink
+            to="/admin/audit-log"
+            className={({ isActive }) => `sidebar-nav-item ${isActive ? 'sidebar-nav-item--active' : ''}`}
+            onClick={() => setMobileOpen(false)}
+          >
+            <Shield size={16} />
+            <span>Audit Log</span>
+          </NavLink>
+          <NavLink
             to="/admin/activity"
             className={({ isActive }) => `sidebar-nav-item ${isActive ? 'sidebar-nav-item--active' : ''}`}
             onClick={() => setMobileOpen(false)}
           >
             <Activity size={16} />
-            <span>Audit Log</span>
+            <span>Activity Stream</span>
           </NavLink>
         </nav>
 

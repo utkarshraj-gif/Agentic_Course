@@ -18,6 +18,13 @@ from backend.models.course import (
 
 WEEKS_CONFIG = [
     {
+        "n": 0,
+        "title": "Prerequisites & Environment Setup",
+        "classes": [0],
+        "summary": "Workstation diagnostics, Python 3.10+ virtual environments, vector database initialization, Docker runtimes, and multi-provider API credential provisioning.",
+        "tools": ["Python 3.10+", "Virtualenv", "LangGraph", "Chroma DB", "FAISS", "Docker"]
+    },
+    {
         "n": 1,
         "title": "Foundations of Agentic AI",
         "classes": [1, 2],
@@ -69,6 +76,7 @@ WEEKS_CONFIG = [
 ]
 
 CLASS_DIRECTORIES = {
+    0: "classes/class00_prerequisites",
     1: "classes/class01_intro_agentic_ai",
     2: "classes/class02_prompt_engineering",
     3: "classes/class03_embeddings_rag",
@@ -87,6 +95,7 @@ CLASS_DIRECTORIES = {
 }
 
 CLASS_META = {
+    0: {"short": "Prerequisites & Environment Setup", "domain": "Workstation & API verification", "tools": ["Python 3.10+", "Virtualenv", "LangGraph", "FAISS", "Chroma DB", "Docker"]},
     1: {"short": "Introduction to Agentic AI", "domain": "Clinical prior-authorization intake", "tools": ["LangChain", "LangGraph", "OpenAI"]},
     2: {"short": "Prompt Engineering and Designing Agents", "domain": "Legal clause triage", "tools": ["OpenAI", "LangChain", "DSPy"]},
     3: {"short": "Embeddings and RAG", "domain": "Clinical medical-policy Q&A", "tools": ["FAISS", "OpenAI embeddings"]},
@@ -242,15 +251,29 @@ def _read_code_files(folder_path: Path) -> List[CodeFile]:
     
     # Priority order for display
     py_files = sorted(folder_path.glob("*.py"))
-    docker_files = sorted(folder_path.glob("Dockerfile*"))
-    all_files = py_files + docker_files
+    docker_files = sorted(folder_path.glob("Dockerfile*")) + sorted(folder_path.glob("docker-compose*.yml"))
+    config_files = sorted(folder_path.glob("*.env*")) + sorted(folder_path.glob("requirements*.txt")) + sorted(folder_path.glob("*.sh")) + sorted(folder_path.glob("*.json"))
+    all_files = py_files + docker_files + config_files
     
+    seen_names = set()
     for p in all_files:
-        if p.name.startswith("__"):
+        if p.name.startswith("__") or p.name in seen_names:
             continue
+        seen_names.add(p.name)
         try:
             content = p.read_text(encoding="utf-8")
-            lang = "python" if p.suffix == ".py" else ("dockerfile" if "docker" in p.name.lower() else "text")
+            if p.suffix == ".py":
+                lang = "python"
+            elif p.suffix in [".yml", ".yaml"]:
+                lang = "yaml"
+            elif p.suffix == ".sh":
+                lang = "bash"
+            elif p.suffix == ".json":
+                lang = "json"
+            elif "docker" in p.name.lower():
+                lang = "dockerfile"
+            else:
+                lang = "text"
             files.append(CodeFile(name=p.name, lang=lang, code=content))
         except Exception:
             pass

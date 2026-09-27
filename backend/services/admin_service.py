@@ -379,21 +379,22 @@ class AdminService:
                             "type": r["type"],
                             "label": r["label"],
                             "classId": r["class_id"],
-                            "timestamp": r["logged_at"].strftime("%H:%M:%S UTC") if r["logged_at"] else "Just now"
+                            "timestamp": r["logged_at"].isoformat() if r["logged_at"] else datetime.now(timezone.utc).isoformat()
                         })
         except Exception as e:
             logger.warning(f"[Admin Activity Feed] Error querying DB: {e}")
 
         # If DB activity is empty or small, supplement with realistic simulated enterprise live stream
         if len(feed) < 8:
+            now_utc = datetime.now(timezone.utc)
             synthetic_events = [
-                {"id": 991, "userId": "user_sarah_chen", "userName": "Dr. Sarah Chen", "type": "quiz_complete", "label": "Passed Quiz: Class 15 HITL Deep Dive (100%)", "classId": 15, "timestamp": "3m ago"},
-                {"id": 992, "userId": "user_alex_rivera", "userName": "Alex Rivera", "type": "sandbox_run", "label": "Executed Multi-Agent A2A Protocol Handshake (Class 12)", "classId": 12, "timestamp": "8m ago"},
-                {"id": 993, "userId": "user_elena_rostova", "userName": "Elena Rostova", "type": "project_start", "label": "Initiated Capstone: Legal Contract Review Agent", "classId": None, "timestamp": "18m ago"},
-                {"id": 994, "userId": "user_marcus_vance", "userName": "Marcus Vance", "type": "lesson_complete", "label": "Completed Lesson: Class 06 Memory & MCP Architecture", "classId": 6, "timestamp": "25m ago"},
-                {"id": 995, "userId": "user_david_kim", "userName": "David Kim", "type": "quiz_complete", "label": "Passed Quiz: Class 13 Security & Red Teaming (95%)", "classId": 13, "timestamp": "34m ago"},
-                {"id": 996, "userId": "user_priya_patel", "userName": "Priya Patel", "type": "bookmark", "label": "Bookmarked: Class 11 Observability & Guardrails", "classId": 11, "timestamp": "42m ago"},
-                {"id": 997, "userId": "user_charlotte_dubois", "userName": "Charlotte Dubois", "type": "lesson_start", "label": "Started: Class 14 Open Source vs Proprietary Models", "classId": 14, "timestamp": "55m ago"},
+                {"id": 991, "userId": "user_sarah_chen", "userName": "Dr. Sarah Chen", "type": "quiz_complete", "label": "Passed Quiz: Class 15 HITL Deep Dive (100%)", "classId": 15, "timestamp": (now_utc - timedelta(minutes=3)).isoformat()},
+                {"id": 992, "userId": "user_alex_rivera", "userName": "Alex Rivera", "type": "sandbox_run", "label": "Executed Multi-Agent A2A Protocol Handshake (Class 12)", "classId": 12, "timestamp": (now_utc - timedelta(minutes=8)).isoformat()},
+                {"id": 993, "userId": "user_elena_rostova", "userName": "Elena Rostova", "type": "project_start", "label": "Initiated Capstone: Legal Contract Review Agent", "classId": None, "timestamp": (now_utc - timedelta(minutes=18)).isoformat()},
+                {"id": 994, "userId": "user_marcus_vance", "userName": "Marcus Vance", "type": "lesson_complete", "label": "Completed Lesson: Class 06 Memory & MCP Architecture", "classId": 6, "timestamp": (now_utc - timedelta(minutes=25)).isoformat()},
+                {"id": 995, "userId": "user_david_kim", "userName": "David Kim", "type": "quiz_complete", "label": "Passed Quiz: Class 13 Security & Red Teaming (95%)", "classId": 13, "timestamp": (now_utc - timedelta(minutes=34)).isoformat()},
+                {"id": 996, "userId": "user_priya_patel", "userName": "Priya Patel", "type": "bookmark", "label": "Bookmarked: Class 11 Observability & Guardrails", "classId": 11, "timestamp": (now_utc - timedelta(minutes=42)).isoformat()},
+                {"id": 997, "userId": "user_charlotte_dubois", "userName": "Charlotte Dubois", "type": "lesson_start", "label": "Started: Class 14 Open Source vs Proprietary Models", "classId": 14, "timestamp": (now_utc - timedelta(minutes=55)).isoformat()},
             ]
             feed = feed + synthetic_events
 

@@ -2,6 +2,7 @@
 // Production React Flow Architecture & Process Diagram Component with ELK Layout
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { createPortal } from 'react-dom';
 import {
   ReactFlow,
   ReactFlowProvider,
@@ -27,7 +28,9 @@ import './ArchitectureFlow.css';
 import {
   RefreshCw,
   X,
-  AlertCircle
+  AlertCircle,
+  Maximize2,
+  Layers
 } from 'lucide-react';
 
 export interface ArchitectureFlowProps {
@@ -37,6 +40,7 @@ export interface ArchitectureFlowProps {
   showControls?: boolean;
   showMinimap?: boolean;
   showToolbar?: boolean;
+  isModal?: boolean;
   onNodeClick?: (node: Node) => void;
 }
 
@@ -47,6 +51,7 @@ const ArchitectureFlowInner: React.FC<ArchitectureFlowProps> = ({
   height = '620px',
   showControls = true,
   showMinimap = true,
+  isModal = false,
   onNodeClick,
 }) => {
   const { fitView } = useReactFlow();
@@ -57,6 +62,18 @@ const ArchitectureFlowInner: React.FC<ArchitectureFlowProps> = ({
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedNode, setSelectedNode] = useState<Node | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (!isModalOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setIsModalOpen(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isModalOpen]);
 
   useEffect(() => {
     if (initialDiagramId && initialDiagramId !== diagramId) {
@@ -122,13 +139,13 @@ const ArchitectureFlowInner: React.FC<ArchitectureFlowProps> = ({
           type: 'smoothstep',
           markerEnd: {
             type: MarkerType.ArrowClosed,
-            color: '#0891b2',
-            width: 16,
-            height: 16,
+            color: '#0284c7',
+            width: 22,
+            height: 22,
           },
           style: {
-            stroke: '#0891b2',
-            strokeWidth: 1.8,
+            stroke: '#0284c7',
+            strokeWidth: 2.2,
           },
           data: e.metadata,
         }));
@@ -171,6 +188,19 @@ const ArchitectureFlowInner: React.FC<ArchitectureFlowProps> = ({
 
   return (
     <div className="architecture-flow-wrapper" style={{ height }}>
+      {/* Floating Enlarge Diagram Button */}
+      {!isModal && (
+        <button
+          type="button"
+          className="architecture-flow-enlarge-overlay-btn"
+          onClick={() => setIsModalOpen(true)}
+          title="Click to view diagram in full enlarged window"
+        >
+          <Maximize2 size={14} />
+          <span>Click to Enlarge</span>
+        </button>
+      )}
+
       {/* Main Flow Canvas */}
       <div className="architecture-flow-canvas">
         {loading && (
@@ -278,6 +308,52 @@ const ArchitectureFlowInner: React.FC<ArchitectureFlowProps> = ({
           </aside>
         )}
       </div>
+
+      {/* Enlarged Fullscreen Lightbox Modal */}
+      {isModalOpen &&
+        createPortal(
+          <div
+            className="architecture-flow-modal-backdrop"
+            onClick={() => setIsModalOpen(false)}
+            role="dialog"
+            aria-modal="true"
+          >
+            <div
+              className="architecture-flow-modal-window"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="architecture-flow-modal-header">
+                <div className="architecture-flow-modal-title">
+                  <Layers size={18} />
+                  <span>{initialGraph?.name || 'Architecture & Technology Roadmap Diagram'}</span>
+                  <span className="architecture-flow-modal-badge">Interactive Full View</span>
+                </div>
+                <div className="architecture-flow-modal-actions">
+                  <button
+                    type="button"
+                    className="architecture-flow-modal-close-btn"
+                    onClick={() => setIsModalOpen(false)}
+                    title="Close Enlarged View (Esc)"
+                  >
+                    <X size={18} />
+                    <span>Close (Esc)</span>
+                  </button>
+                </div>
+              </div>
+              <div className="architecture-flow-modal-body">
+                <ArchitectureFlow
+                  initialGraph={initialGraph}
+                  height="100%"
+                  showControls={true}
+                  showMinimap={true}
+                  showToolbar={false}
+                  isModal={true}
+                />
+              </div>
+            </div>
+          </div>,
+          document.body
+        )}
     </div>
   );
 };

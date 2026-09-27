@@ -17,6 +17,8 @@ const SKILLS: Skill[] = [
   { name: 'Agentic RAG & Performance', description: 'Agentic retrieval loops, fine-tuning, inference optimization', classes: [9, 10] },
   { name: 'Production & Observability', description: 'OpenTelemetry, guardrails, observability pipelines', classes: [11] },
   { name: 'Multi-Agent Systems', description: 'A2A protocol, coordination, deployment', classes: [12] },
+  { name: 'AI Security & Red Teaming', description: 'Prompt injection defense, jailbreak mitigation, security audits', classes: [13] },
+  { name: 'Model Economics & Deployment', description: 'Open-source vs proprietary tradeoffs, vLLM cost modeling, HITL production systems', classes: [14, 15] },
 ];
 
 function SkillBar({ skill }: { skill: Skill }) {

@@ -256,10 +256,23 @@ export function AdminActivityPage() {
                     <tr key={ev.id}>
                       <td style={{ fontSize: '0.78rem', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>
                         <div style={{ fontWeight: 600, color: 'var(--text-main)' }}>
-                          {new Date(ev.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                          {(() => {
+                            if (!ev.timestamp) return 'Just now';
+                            const str = String(ev.timestamp).trim();
+                            if (str.endsWith('ago') || str.toLowerCase() === 'just now') return str;
+                            if (/^\d{1,2}:\d{2}(:\d{2})?(\s*UTC)?$/i.test(str)) return str.replace(/\s*UTC/i, '');
+                            const d = new Date(str);
+                            return isNaN(d.getTime()) ? str : d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                          })()}
                         </div>
                         <div style={{ fontSize: '0.7rem' }}>
-                          {new Date(ev.timestamp).toLocaleDateString()}
+                          {(() => {
+                            if (!ev.timestamp) return '';
+                            const str = String(ev.timestamp).trim();
+                            if (str.endsWith('ago') || str.toLowerCase() === 'just now') return 'Today';
+                            const d = new Date(str);
+                            return isNaN(d.getTime()) ? 'Today' : d.toLocaleDateString([], { month: 'short', day: 'numeric' });
+                          })()}
                         </div>
                       </td>
                       <td>

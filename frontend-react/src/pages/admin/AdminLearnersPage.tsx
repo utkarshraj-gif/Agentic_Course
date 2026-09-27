@@ -13,13 +13,16 @@ import {
   Download,
   RefreshCw,
   ExternalLink,
-  User
+  User,
+  AlertTriangle
 } from 'lucide-react';
 import { AdminService } from '../../services/admin/AdminService';
 import type {
   LearnerOverview,
   LearnerDossier
 } from '../../services/admin/AdminService';
+import { getRiskOverview } from '../../services/adminEnterpriseApi';
+import type { RiskOverview } from '../../services/adminEnterpriseApi';
 import { AdminErrorBanner } from '../../components/admin/AdminErrorBanner';
 import { downloadCsv } from '../../services/admin/exportUtils';
 import { AdminTableSkeleton } from '../../components/common/Skeleton';
@@ -40,6 +43,10 @@ export function AdminLearnersPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Enterprise Data-Driven Risk Engine State
+  const [riskOverview, setRiskOverview] = useState<RiskOverview | null>(null);
+  const [riskCategoryFilter, setRiskCategoryFilter] = useState<'all' | 'at_risk' | 'inactive' | 'behind' | 'failing'>('all');
+
   // Modal / Dossier State
   const [activeDossierId, setActiveDossierId] = useState<string | null>(null);
   const [dossier, setDossier] = useState<LearnerDossier | null>(null);
@@ -50,8 +57,14 @@ export function AdminLearnersPage() {
   const fetchLearners = useCallback(async (query: string = searchTerm, cohort: string = selectedCohort) => {
     try {
       setLoading(true);
-      const data = await AdminService.getLearners(cohort, query);
+      const [data, riskData] = await Promise.all([
+        AdminService.getLearners(cohort, query),
+        getRiskOverview(cohort !== 'All' ? cohort : undefined).catch(() => null)
+      ]);
       setLearners(data);
+      if (riskData) {
+        setRiskOverview(riskData);
+      }
       setError(null);
     } catch (err: any) {
       console.error('Failed to fetch learners:', err);
@@ -175,6 +188,98 @@ export function AdminLearnersPage() {
         </div>
       </div>
 
+      {/* Attention Required: Enterprise Data-Driven Risk Summary */}
+      {riskOverview && riskOverview.at_risk_count > 0 && (
+        <div style={{
+          background: 'rgba(245, 158, 11, 0.08)',
+          border: '1px solid rgba(245, 158, 11, 0.3)',
+          borderRadius: '12px',
+          padding: '1.25rem 1.5rem',
+          marginBottom: '1.5rem',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          flexWrap: 'wrap',
+          gap: '1rem'
+        }}>
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.35rem' }}>
+              <AlertTriangle size={18} color="#f59e0b" />
+              <span style={{ fontWeight: 700, color: '#f59e0b', fontSize: '1rem' }}>
+                Attention Required: {riskOverview.at_risk_count} Learners At Risk
+              </span>
+            </div>
+            <p style={{ margin: 0, fontSize: '0.825rem', color: 'var(--text-muted)' }}>
+              Deterministic risk engine identifies learners requiring intervention based on inactivity, lagging milestones, or low assessment averages.
+            </p>
+          </div>
+
+          <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', alignItems: 'center' }}>
+            <button
+              onClick={() => setRiskCategoryFilter(riskCategoryFilter === 'inactive' ? 'all' : 'inactive')}
+              style={{
+                background: riskCategoryFilter === 'inactive' ? 'rgba(239, 68, 68, 0.2)' : 'var(--surface-2)',
+                border: riskCategoryFilter === 'inactive' ? '1px solid #ef4444' : '1px solid var(--border)',
+                borderRadius: '6px',
+                padding: '0.4rem 0.8rem',
+                fontSize: '0.8rem',
+                color: riskCategoryFilter === 'inactive' ? '#f87171' : 'var(--text-main)',
+                cursor: 'pointer',
+                fontWeight: 600
+              }}
+            >
+              🔴 {riskOverview.critical_inactivity_count || 0} inactive &gt; 7 days
+            </button>
+            <button
+              onClick={() => setRiskCategoryFilter(riskCategoryFilter === 'behind' ? 'all' : 'behind')}
+              style={{
+                background: riskCategoryFilter === 'behind' ? 'rgba(245, 158, 11, 0.2)' : 'var(--surface-2)',
+                border: riskCategoryFilter === 'behind' ? '1px solid #f59e0b' : '1px solid var(--border)',
+                borderRadius: '6px',
+                padding: '0.4rem 0.8rem',
+                fontSize: '0.8rem',
+                color: riskCategoryFilter === 'behind' ? '#fbbf24' : 'var(--text-main)',
+                cursor: 'pointer',
+                fontWeight: 600
+              }}
+            >
+              🟠 {riskOverview.behind_schedule_count || 0} behind schedule
+            </button>
+            <button
+              onClick={() => setRiskCategoryFilter(riskCategoryFilter === 'failing' ? 'all' : 'failing')}
+              style={{
+                background: riskCategoryFilter === 'failing' ? 'rgba(239, 68, 68, 0.2)' : 'var(--surface-2)',
+                border: riskCategoryFilter === 'failing' ? '1px solid #ef4444' : '1px solid var(--border)',
+                borderRadius: '6px',
+                padding: '0.4rem 0.8rem',
+                fontSize: '0.8rem',
+                color: riskCategoryFilter === 'failing' ? '#f87171' : 'var(--text-main)',
+                cursor: 'pointer',
+                fontWeight: 600
+              }}
+            >
+              🟡 {riskOverview.failing_assessments_count || 0} low assessments
+            </button>
+            {riskCategoryFilter !== 'all' && (
+              <button
+                onClick={() => setRiskCategoryFilter('all')}
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  color: 'var(--text-muted)',
+                  fontSize: '0.8rem',
+                  cursor: 'pointer',
+                  textDecoration: 'underline',
+                  marginLeft: '0.25rem'
+                }}
+              >
+                Clear Filter
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Filter and Search Bar */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
         <div style={{ display: 'flex', gap: '6px', background: 'var(--surface-2)', padding: '4px', borderRadius: 'var(--radius-md)', border: '1px solid var(--border)', flexWrap: 'wrap' }}>
@@ -250,13 +355,29 @@ export function AdminLearnersPage() {
                   <th>Curriculum Progress</th>
                   <th>Avg Quiz</th>
                   <th>Capstones</th>
+                  <th>Risk Status</th>
                   <th>Last Active</th>
                   <th style={{ textAlign: 'right' }}>Actions</th>
                 </tr>
               </thead>
               <tbody>
-                {learners.map((l) => {
+                {learners
+                  .filter((l) => {
+                    if (riskCategoryFilter === 'all') return true;
+                    const rItem = (riskOverview?.learners || []).find((r) => r.user_id === l.id);
+                    if (!rItem) return false;
+                    if (riskCategoryFilter === 'at_risk') return rItem.status === 'at_risk';
+                    if (riskCategoryFilter === 'inactive') return (rItem.inactive_days || 0) > 7 || (rItem.reasons || []).some(r => r.toLowerCase().includes('inactive') || r.toLowerCase().includes('activity'));
+                    if (riskCategoryFilter === 'behind') return (rItem.progress_gap || 0) > 15 || (rItem.reasons || []).some(r => r.toLowerCase().includes('behind') || r.toLowerCase().includes('pacing'));
+                    if (riskCategoryFilter === 'failing') return (rItem.avg_score || 80) < 70 || (rItem.reasons || []).some(r => r.toLowerCase().includes('assessment') || r.toLowerCase().includes('proficiency'));
+                    return true;
+                  })
+                  .map((l) => {
                   const completionPct = Math.round((l.completed_classes.length / 15) * 100);
+                  const riskItem = (riskOverview?.learners || []).find(r => r.user_id === l.id);
+                  const isAtRisk = riskItem?.status === 'at_risk';
+                  const isAhead = riskItem?.status === 'ahead';
+
                   return (
                     <tr key={l.id}>
                       <td>
@@ -302,6 +423,28 @@ export function AdminLearnersPage() {
                         <span style={{ fontSize: '0.8rem', color: 'var(--text-main)', fontWeight: 500 }}>
                           {l.capstones.length} of 4
                         </span>
+                      </td>
+                      <td>
+                        <div style={{ display: 'inline-flex', flexDirection: 'column', gap: '3px' }}>
+                          <span style={{
+                            background: isAtRisk ? 'rgba(239, 68, 68, 0.15)' : isAhead ? 'rgba(16, 185, 129, 0.15)' : 'rgba(59, 130, 246, 0.15)',
+                            color: isAtRisk ? '#f87171' : isAhead ? '#34d399' : '#60a5fa',
+                            border: isAtRisk ? '1px solid rgba(239, 68, 68, 0.3)' : isAhead ? '1px solid rgba(16, 185, 129, 0.3)' : '1px solid rgba(59, 130, 246, 0.3)',
+                            padding: '2px 7px',
+                            borderRadius: '4px',
+                            fontSize: '0.72rem',
+                            fontWeight: 700,
+                            textTransform: 'uppercase',
+                            alignSelf: 'flex-start'
+                          }}>
+                            {riskItem?.status ? riskItem.status.replace('_', ' ') : 'on track'}
+                          </span>
+                          {riskItem?.reasons && riskItem.reasons.length > 0 && (
+                            <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', maxWidth: '170px', lineHeight: '1.2' }} title={riskItem.reasons.join(' | ')}>
+                              {riskItem.reasons[0]}
+                            </span>
+                          )}
+                        </div>
                       </td>
                       <td>
                         <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>{l.last_active}</span>

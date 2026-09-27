@@ -3,8 +3,8 @@ import { useState, useEffect } from 'react';
 import { Outlet } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
 import { Sidebar } from './Sidebar';
+import { API_BASE } from '../../services/api';
 
-const API_BASE = 'http://127.0.0.1:8000/api';
 
 interface ClassInfo {
   id: number;
@@ -20,17 +20,27 @@ export function AppLayout() {
   const [refreshKey, setRefreshKey] = useState(0);
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  useEffect(() => {
-    fetch(`${API_BASE}/curriculum`)
+  const fetchCurriculum = () => {
+    fetch(`${API_BASE}/curriculum?_t=${Date.now()}`, { cache: 'no-store' })
       .then(res => res.json())
       .then(setOverview)
       .catch(console.error);
+  };
+
+  useEffect(() => {
+    fetchCurriculum();
   }, []);
 
   useEffect(() => {
     const handler = () => setRefreshKey(k => k + 1);
     window.addEventListener('progress_updated', handler);
     return () => window.removeEventListener('progress_updated', handler);
+  }, []);
+
+  useEffect(() => {
+    const handler = () => fetchCurriculum();
+    window.addEventListener('courses_updated', handler);
+    return () => window.removeEventListener('courses_updated', handler);
   }, []);
 
   return (

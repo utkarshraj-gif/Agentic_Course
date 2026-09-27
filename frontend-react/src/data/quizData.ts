@@ -16,6 +16,35 @@ export interface ClassQuiz {
 
 export const QUIZ_DATA: ClassQuiz[] = [
   {
+    classId: 0,
+    questions: [
+      {
+        id: '0-1',
+        question: 'Why is it critical to manage agent environment dependencies within an isolated virtual environment?',
+        options: [
+          'Virtual environments make Python code execute 10x faster',
+          'Agent frameworks frequently update schemas and checkpoint serializers that can break between versions',
+          'Python does not allow running scripts without virtual environments',
+          'It is required by OpenAI for API authentication',
+        ],
+        correctIndex: 1,
+        explanation: 'Fast-moving agentic frameworks (LangGraph, Pydantic v2, vector DB drivers) require pinned dependencies to ensure consistent schema validation and state serialization.',
+      },
+      {
+        id: '0-2',
+        question: 'What is the recommended practice for managing API keys and secrets in local agent development?',
+        options: [
+          'Commit them in `.env` directly to GitHub for teammate access',
+          'Hardcode keys into the agent prompt string',
+          'Store keys in gitignored environment files or secrets managers and provide offline mock fallbacks for testing',
+          'Never use API keys, only use public unauthenticated models',
+        ],
+        correctIndex: 2,
+        explanation: 'API keys must never be hardcoded or committed to source control; using gitignored environment variables with fallback mock modes enables safe, cost-free testing.',
+      },
+    ],
+  },
+  {
     classId: 1,
     questions: [
       {

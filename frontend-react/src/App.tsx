@@ -14,6 +14,8 @@ import { SearchPage } from './pages/SearchPage';
 import { AppLayout } from './components/layout/AppLayout';
 import { ClassDetail } from './components/lesson/ClassDetail';
 import { CapstoneDetail } from './components/capstone/CapstoneDetail';
+import { ErrorBoundary } from './components/common/ErrorBoundary';
+import { NotFoundPage } from './pages/NotFoundPage';
 
 // Admin imports (isolated access via /admin/*)
 import { AdminAuthGuard } from './components/admin/AdminAuthGuard';
@@ -25,6 +27,11 @@ import { AdminAnalyticsPage } from './pages/admin/AdminAnalyticsPage';
 import { AdminActivityPage } from './pages/admin/AdminActivityPage';
 import { AdminSandboxTelemetryPage } from './pages/admin/AdminSandboxTelemetryPage';
 import { AdminLearnerDetailPage } from './pages/admin/AdminLearnerDetailPage';
+import { AdminCoursesPage } from './pages/admin/AdminCoursesPage';
+import { AdminCourseBuilderPage } from './pages/admin/AdminCourseBuilderPage';
+import { AdminCohortsPage } from './pages/admin/AdminCohortsPage';
+import { AdminCohortDetailPage } from './pages/admin/AdminCohortDetailPage';
+import { AdminAuditLogPage } from './pages/admin/AdminAuditLogPage';
 
 function PageTitleManager() {
   const location = useLocation();
@@ -45,6 +52,8 @@ function PageTitleManager() {
       title = 'Overview | Velloe Learns';
     } else if (path === '/curriculum') {
       title = 'Courses | Velloe Learns';
+    } else if (path.startsWith('/curriculum/')) {
+      title = 'Enterprise AI Agent Course | Velloe Learns';
     } else if (path.startsWith('/class/')) {
       const id = path.split('/')[2];
       title = `Class ${id} | Velloe Learns`;
@@ -93,7 +102,7 @@ function App() {
   }, []);
 
   return (
-    <>
+    <ErrorBoundary>
       <PageTitleManager />
       {zoomDiagram && (
         <DiagramZoomModal
@@ -121,11 +130,18 @@ function App() {
         >
           <Route index element={<Navigate to="/admin/dashboard" replace />} />
           <Route path="dashboard" element={<AdminDashboardPage />} />
+          <Route path="courses" element={<AdminCoursesPage />} />
+          <Route path="courses/new" element={<AdminCourseBuilderPage />} />
+          <Route path="courses/:courseId" element={<AdminCourseBuilderPage />} />
+          <Route path="cohorts" element={<AdminCohortsPage />} />
+          <Route path="cohorts/:cohortId" element={<AdminCohortDetailPage />} />
           <Route path="learners" element={<AdminLearnersPage />} />
           <Route path="learners/:userId" element={<AdminLearnerDetailPage />} />
           <Route path="analytics" element={<AdminAnalyticsPage />} />
           <Route path="sandboxes" element={<AdminSandboxTelemetryPage />} />
+          <Route path="audit-log" element={<AdminAuditLogPage />} />
           <Route path="activity" element={<AdminActivityPage />} />
+          <Route path="*" element={<NotFoundPage isAdmin />} />
         </Route>
 
         {/* Protected learner academy routes */}
@@ -140,16 +156,17 @@ function App() {
           <Route path="dashboard" element={<DashboardPage />} />
           <Route path="overview" element={<DashboardPage />} />
           <Route path="curriculum" element={<CurriculumPage />} />
+          <Route path="curriculum/:courseSlug" element={<CurriculumPage />} />
           <Route path="class/:id" element={<ClassDetail />} />
           <Route path="practice" element={<PracticePage />} />
           <Route path="projects" element={<ProjectsPage />} />
           <Route path="capstones/:slug" element={<CapstoneDetail />} />
           <Route path="skills" element={<SkillMapPage />} />
           <Route path="search" element={<SearchPage />} />
-          <Route path="*" element={<Navigate to="/dashboard" replace />} />
+          <Route path="*" element={<NotFoundPage />} />
         </Route>
       </Routes>
-    </>
+    </ErrorBoundary>
   );
 }
 

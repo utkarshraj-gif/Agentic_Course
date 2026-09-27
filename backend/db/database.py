@@ -112,6 +112,153 @@ def init_db() -> None:
         class_title  TEXT NOT NULL,
         visited_at   TIMESTAMPTZ DEFAULT NOW()
     );
+
+    CREATE TABLE IF NOT EXISTS courses (
+        id                  TEXT PRIMARY KEY,
+        slug                TEXT UNIQUE NOT NULL,
+        title               TEXT NOT NULL,
+        short_title         TEXT,
+        category            TEXT NOT NULL DEFAULT 'Engineering',
+        level               TEXT NOT NULL DEFAULT 'Intermediate',
+        icon                TEXT DEFAULT '🤖',
+        banner_image        TEXT,
+        short_description   TEXT,
+        description         TEXT NOT NULL,
+        estimated_duration  TEXT DEFAULT '4 Weeks',
+        estimated_hours     INTEGER DEFAULT 20,
+        status              TEXT NOT NULL DEFAULT 'draft',
+        tags                JSONB DEFAULT '[]'::jsonb,
+        created_by          TEXT DEFAULT 'System Administrator',
+        created_at          TIMESTAMPTZ DEFAULT NOW(),
+        updated_at          TIMESTAMPTZ DEFAULT NOW(),
+        published_at        TIMESTAMPTZ
+    );
+
+    CREATE TABLE IF NOT EXISTS course_modules (
+        id                  TEXT PRIMARY KEY,
+        course_id           TEXT NOT NULL REFERENCES courses(id) ON DELETE CASCADE,
+        module_number       INTEGER NOT NULL,
+        title               TEXT NOT NULL,
+        description         TEXT,
+        tools               JSONB DEFAULT '[]'::jsonb,
+        position            INTEGER NOT NULL DEFAULT 1,
+        created_at          TIMESTAMPTZ DEFAULT NOW()
+    );
+
+    CREATE TABLE IF NOT EXISTS course_classes (
+        id                  TEXT PRIMARY KEY,
+        course_id           TEXT NOT NULL REFERENCES courses(id) ON DELETE CASCADE,
+        module_id           TEXT NOT NULL REFERENCES course_modules(id) ON DELETE CASCADE,
+        class_number        INTEGER NOT NULL,
+        slug                TEXT,
+        title               TEXT NOT NULL,
+        short_title         TEXT,
+        description         TEXT,
+        duration            TEXT DEFAULT '60 min',
+        position            INTEGER NOT NULL DEFAULT 1,
+        lesson_content      TEXT,
+        topics              JSONB DEFAULT '[]'::jsonb,
+        learning_objectives JSONB DEFAULT '[]'::jsonb,
+        diagrams            JSONB DEFAULT '[]'::jsonb,
+        code_examples       JSONB DEFAULT '[]'::jsonb,
+        quiz                JSONB DEFAULT '[]'::jsonb,
+        skills              JSONB DEFAULT '[]'::jsonb,
+        created_at          TIMESTAMPTZ DEFAULT NOW(),
+        updated_at          TIMESTAMPTZ DEFAULT NOW()
+    );
+
+    CREATE TABLE IF NOT EXISTS course_enrollments (
+        id                  SERIAL PRIMARY KEY,
+        user_id             TEXT NOT NULL,
+        course_id           TEXT NOT NULL REFERENCES courses(id) ON DELETE CASCADE,
+        cohort              TEXT DEFAULT 'Enterprise Cohort',
+        enrolled_at         TIMESTAMPTZ DEFAULT NOW(),
+        status              TEXT DEFAULT 'active',
+        UNIQUE (user_id, course_id)
+    );
+
+    CREATE TABLE IF NOT EXISTS course_versions (
+        id                  TEXT PRIMARY KEY,
+        course_id           TEXT NOT NULL REFERENCES courses(id) ON DELETE CASCADE,
+        version_number      TEXT NOT NULL,
+        status              TEXT NOT NULL DEFAULT 'draft',
+        created_by          TEXT DEFAULT 'System Administrator',
+        change_summary      TEXT,
+        snapshot_data       JSONB DEFAULT '{}'::jsonb,
+        created_at          TIMESTAMPTZ DEFAULT NOW(),
+        published_at        TIMESTAMPTZ,
+        UNIQUE (course_id, version_number)
+    );
+
+    CREATE TABLE IF NOT EXISTS content_reviews (
+        id                  SERIAL PRIMARY KEY,
+        course_id           TEXT NOT NULL REFERENCES courses(id) ON DELETE CASCADE,
+        version_id          TEXT,
+        entity_type         TEXT NOT NULL,
+        entity_id           TEXT NOT NULL,
+        author_name         TEXT NOT NULL,
+        author_role         TEXT DEFAULT 'Reviewer',
+        comment             TEXT NOT NULL,
+        status              TEXT DEFAULT 'open',
+        created_at          TIMESTAMPTZ DEFAULT NOW(),
+        resolved_at         TIMESTAMPTZ,
+        resolved_by         TEXT
+    );
+
+    CREATE TABLE IF NOT EXISTS cohorts (
+        id                  TEXT PRIMARY KEY,
+        name                TEXT NOT NULL,
+        description         TEXT,
+        start_date          DATE,
+        end_date            DATE,
+        status              TEXT DEFAULT 'active',
+        created_by          TEXT DEFAULT 'Enterprise Admin',
+        created_at          TIMESTAMPTZ DEFAULT NOW()
+    );
+
+    CREATE TABLE IF NOT EXISTS cohort_members (
+        id                  SERIAL PRIMARY KEY,
+        cohort_id           TEXT NOT NULL REFERENCES cohorts(id) ON DELETE CASCADE,
+        user_id             TEXT NOT NULL,
+        joined_at           TIMESTAMPTZ DEFAULT NOW(),
+        status              TEXT DEFAULT 'active',
+        UNIQUE (cohort_id, user_id)
+    );
+
+    CREATE TABLE IF NOT EXISTS cohort_courses (
+        id                  SERIAL PRIMARY KEY,
+        cohort_id           TEXT NOT NULL REFERENCES cohorts(id) ON DELETE CASCADE,
+        course_id           TEXT NOT NULL REFERENCES courses(id) ON DELETE CASCADE,
+        course_version_id   TEXT,
+        start_date          DATE,
+        deadline            DATE,
+        assigned_at         TIMESTAMPTZ DEFAULT NOW(),
+        UNIQUE (cohort_id, course_id)
+    );
+
+    CREATE TABLE IF NOT EXISTS course_learning_rules (
+        id                  SERIAL PRIMARY KEY,
+        course_id           TEXT NOT NULL REFERENCES courses(id) ON DELETE CASCADE,
+        rule_type           TEXT NOT NULL,
+        target_entity_type  TEXT NOT NULL,
+        target_entity_id    TEXT NOT NULL,
+        config              JSONB NOT NULL DEFAULT '{}'::jsonb,
+        is_active           BOOLEAN DEFAULT TRUE,
+        created_at          TIMESTAMPTZ DEFAULT NOW()
+    );
+
+    CREATE TABLE IF NOT EXISTS admin_audit_logs (
+        id                  SERIAL PRIMARY KEY,
+        action              TEXT NOT NULL,
+        actor_name          TEXT NOT NULL,
+        actor_email         TEXT,
+        actor_role          TEXT DEFAULT 'Admin',
+        entity_type         TEXT NOT NULL,
+        entity_id           TEXT NOT NULL,
+        entity_name         TEXT,
+        details             JSONB DEFAULT '{}'::jsonb,
+        timestamp           TIMESTAMPTZ DEFAULT NOW()
+    );
     """
     with get_conn() as conn:
         with conn.cursor() as cur:

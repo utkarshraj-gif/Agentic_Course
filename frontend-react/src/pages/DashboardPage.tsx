@@ -5,6 +5,7 @@ import { ArrowRight, CheckCircle, Clock, BookOpen, Layers, Activity, BarChart2, 
 import { useAuth } from '../services/auth/AuthContext';
 import { ProgressService, DEFAULT_WEEKS } from '../services/progress/ProgressService';
 import type { ActivityItem, LastVisited } from '../services/progress/ProgressService';
+import { ENROLLED_COURSES } from '../data';
 
 interface WeekInfo {
   n: number;
@@ -43,6 +44,8 @@ export function DashboardPage() {
   const { user } = useAuth();
   const ctx = useOutletContext<{ overview: OverviewData | null }>();
   const overview = ctx?.overview ?? null;
+
+  const activeCourse = ENROLLED_COURSES[0];
 
   const [lastVisited, setLastVisited] = useState<LastVisited | null>(null);
   const [activity, setActivity] = useState<ActivityItem[]>([]);
@@ -91,6 +94,7 @@ export function DashboardPage() {
             {lastVisited ? (
               <div className="resume-block">
                 <div className="resume-meta">
+                  <span className="resume-course-badge">{activeCourse.shortTitle}</span>
                   <span className="resume-tag">Class {lastVisited.classId}</span>
                 </div>
                 <h3 className="resume-title">{lastVisited.classTitle}</h3>
@@ -111,8 +115,11 @@ export function DashboardPage() {
               </div>
             ) : (
               <div className="resume-block resume-block--empty">
+                <div className="resume-meta" style={{ marginBottom: '0.5rem' }}>
+                  <span className="resume-course-badge">{activeCourse.shortTitle}</span>
+                </div>
                 <h3 className="resume-title">Start your learning journey</h3>
-                <p>Begin with the foundation of Agentic AI — and build from there.</p>
+                <p>Begin with the foundation of {activeCourse.title} — and build from there.</p>
                 <Link to="/class/1" className="btn btn--primary">
                   Start Class 1 <ArrowRight size={14} />
                 </Link>
@@ -122,9 +129,12 @@ export function DashboardPage() {
 
           {/* Learning Path */}
           <section className="dashboard-card">
-            <div className="dashboard-card-header">
-              <Clock size={16} />
-              <h2>Learning Path</h2>
+            <div className="dashboard-card-header" style={{ justifyContent: 'space-between' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Clock size={16} />
+                <h2>Learning Path</h2>
+              </div>
+              <span className="dashboard-card-tag">{activeCourse.shortTitle}</span>
             </div>
             <div className="learning-path">
               {(overview?.weeks ?? DEFAULT_WEEKS).map((week) => {
@@ -202,11 +212,11 @@ export function DashboardPage() {
                 <div className="progress-ring-label">{progress.percent}%</div>
               </div>
               <div className="progress-summary-text">
-                <div className="progress-summary-title">Agentic AI Program</div>
+                <div className="progress-summary-title">{activeCourse.title}</div>
                 <div className="progress-summary-sub">{progress.completed} of {progress.total} classes complete</div>
               </div>
             </div>
-            <Link to="/curriculum" className="btn btn--outline btn--sm" style={{ marginTop: '1rem', display: 'flex' }}>
+            <Link to={`/curriculum/${activeCourse.slug}`} className="btn btn--outline btn--sm" style={{ marginTop: '1rem', display: 'flex' }}>
               View curriculum <ArrowRight size={13} />
             </Link>
           </section>

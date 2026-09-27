@@ -329,7 +329,14 @@ export function AdminDashboardPage() {
                         </Link>
                         <span style={{ fontSize: '0.7rem', color: 'var(--text-light)', flexShrink: 0, marginLeft: '6px' }}>
                           <Clock size={10} style={{ display: 'inline', marginRight: '2px' }} />
-                          {new Date(act.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                          {(() => {
+                            if (!act.timestamp) return 'Just now';
+                            const str = String(act.timestamp).trim();
+                            if (str.endsWith('ago') || str.toLowerCase() === 'just now') return str;
+                            if (/^\d{1,2}:\d{2}(:\d{2})?(\s*UTC)?$/i.test(str)) return str.replace(/\s*UTC/i, '');
+                            const d = new Date(str);
+                            return isNaN(d.getTime()) ? str : d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                          })()}
                         </span>
                       </div>
                       <div style={{ color: 'var(--text-muted)', fontSize: '0.74rem', marginTop: '1px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>

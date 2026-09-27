@@ -5,8 +5,23 @@ from fastapi.responses import FileResponse
 from pathlib import Path
 
 from backend.config import FRONTEND_DIR, CORS_ORIGINS
-from backend.routes import health_router, curriculum_router, capstones_router, agents_router, storage_router, admin_router, compiler_router, diagrams_router
+from backend.routes import (
+    health_router,
+    curriculum_router,
+    capstones_router,
+    agents_router,
+    storage_router,
+    admin_router,
+    admin_courses_router,
+    admin_cohorts_router,
+    admin_enterprise_router,
+    compiler_router,
+    diagrams_router
+)
 from backend.db.database import init_db
+from backend.services.course_management_service import CourseManagementService
+from backend.services.course_versioning_service import CourseVersioningService
+from backend.services.cohort_service import CohortService
 
 app = FastAPI(
     title="Building Enterprise AI Agents - Platform API",
@@ -20,6 +35,9 @@ app = FastAPI(
 def on_startup():
     try:
         init_db()
+        CourseManagementService.seed_reference_course()
+        CourseVersioningService.seed_initial_versions()
+        CohortService.seed_default_cohorts()
     except Exception as e:
         import logging
         logging.getLogger(__name__).warning(f"Database init warning (will retry on demand): {e}")
@@ -31,7 +49,7 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
-    )
+)
 
 # Register API routes under /api
 app.include_router(health_router, prefix="/api")
@@ -40,6 +58,9 @@ app.include_router(capstones_router, prefix="/api")
 app.include_router(agents_router, prefix="/api")
 app.include_router(storage_router, prefix="/api")
 app.include_router(admin_router, prefix="/api")
+app.include_router(admin_courses_router, prefix="/api")
+app.include_router(admin_cohorts_router, prefix="/api")
+app.include_router(admin_enterprise_router, prefix="/api")
 app.include_router(compiler_router, prefix="/api")
 app.include_router(diagrams_router, prefix="/api")
 

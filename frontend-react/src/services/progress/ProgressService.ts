@@ -71,6 +71,7 @@ function postToBackend(endpoint: string, body: object) {
 }
 
 export const DEFAULT_WEEKS: Array<{ n: number; title: string; classes: number[] }> = [
+  { n: 0, title: 'Prerequisites & Environment Setup', classes: [0] },
   { n: 1, title: 'Foundations & Agent Architectures', classes: [1, 2] },
   { n: 2, title: 'Tool Use & Knowledge Retrieval', classes: [3, 4] },
   { n: 3, title: 'Multi-Agent Collaboration & Protocols', classes: [5, 6] },
@@ -211,13 +212,16 @@ export const ProgressService = {
   // Course progress
   getCourseProgress(totalClasses: number, userId?: string): { completed: number; total: number; percent: number } {
     let completed = 0;
-    for (let i = 1; i <= totalClasses; i++) {
-      if (this.isClassCompleted(i, userId)) completed++;
+    const allClasses = Array.from(new Set(DEFAULT_WEEKS.flatMap(w => w.classes)));
+    const targetClasses = allClasses.length > 0 ? allClasses : Array.from({ length: totalClasses }, (_, i) => i);
+    for (const cid of targetClasses) {
+      if (this.isClassCompleted(cid, userId)) completed++;
     }
+    const total = targetClasses.length || totalClasses;
     return {
       completed,
-      total: totalClasses,
-      percent: totalClasses > 0 ? Math.round((completed / totalClasses) * 100) : 0,
+      total,
+      percent: total > 0 ? Math.round((completed / total) * 100) : 0,
     };
   },
 
